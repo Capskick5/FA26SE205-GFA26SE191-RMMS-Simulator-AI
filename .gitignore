@@ -1,0 +1,15 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+.env
+
+# Webots tự sinh khi mở world
+simulator/worlds/.*.wbproj
+simulator/worlds/.*.jpg
+simulator/logs/
+
+.vscode/
+.DS_Store
+Thumbs.db
+desktop.ini

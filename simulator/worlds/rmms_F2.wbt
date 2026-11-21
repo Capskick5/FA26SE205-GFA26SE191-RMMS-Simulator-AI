@@ -1,0 +1,922 @@
+#VRML_SIM R2023b utf8
+
+WorldInfo {
+  info [
+    "RMMS — tầng F2. Sinh tự động từ map/F2.json bằng tools/build_world.py. KHÔNG sửa tay."
+    "Toạ độ: x = đông, y = bắc, mét; gốc = góc trái-dưới khung tầng của FE (10 px FE = 1 m)."
+  ]
+  title "RMMS F2"
+  basicTimeStep 32
+  contactProperties [ ContactProperties { material2 "caster" coulombFriction [ 0 ] } ]
+}
+Viewpoint {
+  orientation -0.4362 0.4362 0.787 1.8081
+  position 51 -49.3483 114.1812
+  near 0.5
+}
+Background { skyColor [ 0.86 0.90 0.93 ] }
+DirectionalLight { ambientIntensity 0.7 direction -0.3 0.4 -1 intensity 1.1 castShadows FALSE }
+DEF FLOOR Solid {
+  translation 51 22 -0.05
+  children [ Shape { appearance PBRAppearance { baseColor 0.7 0.72 0.73 roughness 0.9 metalness 0 } geometry Box { size 102 44 0.1 } } ]
+  name "floor"
+  boundingObject Box { size 102 44 0.1 }
+  locked TRUE
+}
+Pose { translation 51 22 0.006 children [ Shape { appearance PBRAppearance { baseColor 0.92 0.93 0.93 roughness 1 metalness 0 } geometry Box { size 102 6 0.008 } } ] }
+Pose { translation 11 33 0.006 children [ Shape { appearance PBRAppearance { baseColor 0.8 0.89 1 roughness 1 metalness 0 } geometry Box { size 14 16 0.008 } } ] }
+Pose { translation 11 39 0.025 children [ Shape { appearance PBRAppearance { baseColor 1 1 1 roughness 1 metalness 0 baseColorMap ImageTexture { url [ "textures/sign_F2-PHARM.png" ] } } geometry Plane { size 12 3 } } ] }
+Pose { translation 27 33 0.006 children [ Shape { appearance PBRAppearance { baseColor 0.95 0.95 0.93 roughness 1 metalness 0 } geometry Box { size 14 16 0.008 } } ] }
+Pose { translation 27 39 0.025 children [ Shape { appearance PBRAppearance { baseColor 1 1 1 roughness 1 metalness 0 baseColorMap ImageTexture { url [ "textures/sign_F2-WARD-A.png" ] } } geometry Plane { size 12 3 } } ] }
+Pose { translation 43 33 0.006 children [ Shape { appearance PBRAppearance { baseColor 0.95 0.95 0.93 roughness 1 metalness 0 } geometry Box { size 14 16 0.008 } } ] }
+Pose { translation 43 39 0.025 children [ Shape { appearance PBRAppearance { baseColor 1 1 1 roughness 1 metalness 0 baseColorMap ImageTexture { url [ "textures/sign_F2-WARD-B.png" ] } } geometry Plane { size 12 3 } } ] }
+Pose { translation 59 33 0.006 children [ Shape { appearance PBRAppearance { baseColor 0.95 0.95 0.93 roughness 1 metalness 0 } geometry Box { size 14 16 0.008 } } ] }
+Pose { translation 59 39 0.025 children [ Shape { appearance PBRAppearance { baseColor 1 1 1 roughness 1 metalness 0 baseColorMap ImageTexture { url [ "textures/sign_F2-PEDS.png" ] } } geometry Plane { size 12 3 } } ] }
+Pose { translation 75 33 0.006 children [ Shape { appearance PBRAppearance { baseColor 0.95 0.95 0.93 roughness 1 metalness 0 } geometry Box { size 14 16 0.008 } } ] }
+Pose { translation 75 39 0.025 children [ Shape { appearance PBRAppearance { baseColor 1 1 1 roughness 1 metalness 0 baseColorMap ImageTexture { url [ "textures/sign_F2-ICU.png" ] } } geometry Plane { size 12 3 } } ] }
+Pose { translation 91 33 0.006 children [ Shape { appearance PBRAppearance { baseColor 0.95 0.95 0.93 roughness 1 metalness 0 } geometry Box { size 14 16 0.008 } } ] }
+Pose { translation 91 39 0.025 children [ Shape { appearance PBRAppearance { baseColor 1 1 1 roughness 1 metalness 0 baseColorMap ImageTexture { url [ "textures/sign_F2-CARD.png" ] } } geometry Plane { size 12 3 } } ] }
+Pose { translation 11 11 0.006 children [ Shape { appearance PBRAppearance { baseColor 0.82 0.95 0.84 roughness 1 metalness 0 } geometry Box { size 14 16 0.008 } } ] }
+Pose { translation 11 5 0.025 children [ Shape { appearance PBRAppearance { baseColor 1 1 1 roughness 1 metalness 0 baseColorMap ImageTexture { url [ "textures/sign_F2-STORE.png" ] } } geometry Plane { size 12 3 } } ] }
+Pose { translation 27 11 0.006 children [ Shape { appearance PBRAppearance { baseColor 0.92 0.86 1 roughness 1 metalness 0 } geometry Box { size 14 16 0.008 } } ] }
+Pose { translation 27 5 0.025 children [ Shape { appearance PBRAppearance { baseColor 1 1 1 roughness 1 metalness 0 baseColorMap ImageTexture { url [ "textures/sign_F2-BLOOD.png" ] } } geometry Plane { size 12 3 } } ] }
+Pose { translation 43 11 0.006 children [ Shape { appearance PBRAppearance { baseColor 0.95 0.95 0.93 roughness 1 metalness 0 } geometry Box { size 14 16 0.008 } } ] }
+Pose { translation 43 5 0.025 children [ Shape { appearance PBRAppearance { baseColor 1 1 1 roughness 1 metalness 0 baseColorMap ImageTexture { url [ "textures/sign_F2-LAB.png" ] } } geometry Plane { size 12 3 } } ] }
+Pose { translation 59 11 0.006 children [ Shape { appearance PBRAppearance { baseColor 0.95 0.95 0.93 roughness 1 metalness 0 } geometry Box { size 14 16 0.008 } } ] }
+Pose { translation 59 5 0.025 children [ Shape { appearance PBRAppearance { baseColor 1 1 1 roughness 1 metalness 0 baseColorMap ImageTexture { url [ "textures/sign_F2-SURG.png" ] } } geometry Plane { size 12 3 } } ] }
+Pose { translation 75 11 0.006 children [ Shape { appearance PBRAppearance { baseColor 0.95 0.95 0.93 roughness 1 metalness 0 } geometry Box { size 14 16 0.008 } } ] }
+Pose { translation 75 5 0.025 children [ Shape { appearance PBRAppearance { baseColor 1 1 1 roughness 1 metalness 0 baseColorMap ImageTexture { url [ "textures/sign_F2-RESP.png" ] } } geometry Plane { size 12 3 } } ] }
+Pose { translation 91 11 0.006 children [ Shape { appearance PBRAppearance { baseColor 0.9 0.85 0.78 roughness 1 metalness 0 } geometry Box { size 14 16 0.008 } } ] }
+Pose { translation 91 5 0.025 children [ Shape { appearance PBRAppearance { baseColor 1 1 1 roughness 1 metalness 0 baseColorMap ImageTexture { url [ "textures/sign_F2-WASTE.png" ] } } geometry Plane { size 12 3 } } ] }
+Solid {
+  translation 4 11 0.6
+  children [ Shape { appearance PBRAppearance { baseColor 0.93 0.93 0.9 roughness 0.7 metalness 0 } geometry Box { size 0.15 16.15 1.2 } } ]
+  name "wall_0"
+  boundingObject Box { size 0.15 16.15 1.2 }
+  locked TRUE
+}
+Solid {
+  translation 11 3 0.6
+  children [ Shape { appearance PBRAppearance { baseColor 0.93 0.93 0.9 roughness 0.7 metalness 0 } geometry Box { size 14.15 0.15 1.2 } } ]
+  name "wall_1"
+  boundingObject Box { size 14.15 0.15 1.2 }
+  locked TRUE
+}
+Solid {
+  translation 7 19 0.6
+  children [ Shape { appearance PBRAppearance { baseColor 0.93 0.93 0.9 roughness 0.7 metalness 0 } geometry Box { size 6.15 0.15 1.2 } } ]
+  name "wall_2"
+  boundingObject Box { size 6.15 0.15 1.2 }
+  locked TRUE
+}
+Solid {
+  translation 4 33 0.6
+  children [ Shape { appearance PBRAppearance { baseColor 0.93 0.93 0.9 roughness 0.7 metalness 0 } geometry Box { size 0.15 16.15 1.2 } } ]
+  name "wall_3"
+  boundingObject Box { size 0.15 16.15 1.2 }
+  locked TRUE
+}
+Solid {
+  translation 7 25 0.6
+  children [ Shape { appearance PBRAppearance { baseColor 0.93 0.93 0.9 roughness 0.7 metalness 0 } geometry Box { size 6.15 0.15 1.2 } } ]
+  name "wall_4"
+  boundingObject Box { size 6.15 0.15 1.2 }
+  locked TRUE
+}
+Solid {
+  translation 11 41 0.6
+  children [ Shape { appearance PBRAppearance { baseColor 0.93 0.93 0.9 roughness 0.7 metalness 0 } geometry Box { size 14.15 0.15 1.2 } } ]
+  name "wall_5"
+  boundingObject Box { size 14.15 0.15 1.2 }
+  locked TRUE
+}
+Solid {
+  translation 15 19 0.6
+  children [ Shape { appearance PBRAppearance { baseColor 0.93 0.93 0.9 roughness 0.7 metalness 0 } geometry Box { size 6.15 0.15 1.2 } } ]
+  name "wall_6"
+  boundingObject Box { size 6.15 0.15 1.2 }
+  locked TRUE
+}
+Solid {
+  translation 15 25 0.6
+  children [ Shape { appearance PBRAppearance { baseColor 0.93 0.93 0.9 roughness 0.7 metalness 0 } geometry Box { size 6.15 0.15 1.2 } } ]
+  name "wall_7"
+  boundingObject Box { size 6.15 0.15 1.2 }
+  locked TRUE
+}
+Solid {
+  translation 18 11 0.6
+  children [ Shape { appearance PBRAppearance { baseColor 0.93 0.93 0.9 roughness 0.7 metalness 0 } geometry Box { size 0.15 16.15 1.2 } } ]
+  name "wall_8"
+  boundingObject Box { size 0.15 16.15 1.2 }
+  locked TRUE
+}
+Solid {
+  translation 18 33 0.6
+  children [ Shape { appearance PBRAppearance { baseColor 0.93 0.93 0.9 roughness 0.7 metalness 0 } geometry Box { size 0.15 16.15 1.2 } } ]
+  name "wall_9"
+  boundingObject Box { size 0.15 16.15 1.2 }
+  locked TRUE
+}
+Solid {
+  translation 20 11 0.6
+  children [ Shape { appearance PBRAppearance { baseColor 0.93 0.93 0.9 roughness 0.7 metalness 0 } geometry Box { size 0.15 16.15 1.2 } } ]
+  name "wall_10"
+  boundingObject Box { size 0.15 16.15 1.2 }
+  locked TRUE
+}
+Solid {
+  translation 27 3 0.6
+  children [ Shape { appearance PBRAppearance { baseColor 0.93 0.93 0.9 roughness 0.7 metalness 0 } geometry Box { size 14.15 0.15 1.2 } } ]
+  name "wall_11"
+  boundingObject Box { size 14.15 0.15 1.2 }
+  locked TRUE
+}
+Solid {
+  translation 23 19 0.6
+  children [ Shape { appearance PBRAppearance { baseColor 0.93 0.93 0.9 roughness 0.7 metalness 0 } geometry Box { size 6.15 0.15 1.2 } } ]
+  name "wall_12"
+  boundingObject Box { size 6.15 0.15 1.2 }
+  locked TRUE
+}
+Solid {
+  translation 20 33 0.6
+  children [ Shape { appearance PBRAppearance { baseColor 0.93 0.93 0.9 roughness 0.7 metalness 0 } geometry Box { size 0.15 16.15 1.2 } } ]
+  name "wall_13"
+  boundingObject Box { size 0.15 16.15 1.2 }
+  locked TRUE
+}
+Solid {
+  translation 23 25 0.6
+  children [ Shape { appearance PBRAppearance { baseColor 0.93 0.93 0.9 roughness 0.7 metalness 0 } geometry Box { size 6.15 0.15 1.2 } } ]
+  name "wall_14"
+  boundingObject Box { size 6.15 0.15 1.2 }
+  locked TRUE
+}
+Solid {
+  translation 27 41 0.6
+  children [ Shape { appearance PBRAppearance { baseColor 0.93 0.93 0.9 roughness 0.7 metalness 0 } geometry Box { size 14.15 0.15 1.2 } } ]
+  name "wall_15"
+  boundingObject Box { size 14.15 0.15 1.2 }
+  locked TRUE
+}
+Solid {
+  translation 31 19 0.6
+  children [ Shape { appearance PBRAppearance { baseColor 0.93 0.93 0.9 roughness 0.7 metalness 0 } geometry Box { size 6.15 0.15 1.2 } } ]
+  name "wall_16"
+  boundingObject Box { size 6.15 0.15 1.2 }
+  locked TRUE
+}
+Solid {
+  translation 31 25 0.6
+  children [ Shape { appearance PBRAppearance { baseColor 0.93 0.93 0.9 roughness 0.7 metalness 0 } geometry Box { size 6.15 0.15 1.2 } } ]
+  name "wall_17"
+  boundingObject Box { size 6.15 0.15 1.2 }
+  locked TRUE
+}
+Solid {
+  translation 34 11 0.6
+  children [ Shape { appearance PBRAppearance { baseColor 0.93 0.93 0.9 roughness 0.7 metalness 0 } geometry Box { size 0.15 16.15 1.2 } } ]
+  name "wall_18"
+  boundingObject Box { size 0.15 16.15 1.2 }
+  locked TRUE
+}
+Solid {
+  translation 34 33 0.6
+  children [ Shape { appearance PBRAppearance { baseColor 0.93 0.93 0.9 roughness 0.7 metalness 0 } geometry Box { size 0.15 16.15 1.2 } } ]
+  name "wall_19"
+  boundingObject Box { size 0.15 16.15 1.2 }
+  locked TRUE
+}
+Solid {
+  translation 36 11 0.6
+  children [ Shape { appearance PBRAppearance { baseColor 0.93 0.93 0.9 roughness 0.7 metalness 0 } geometry Box { size 0.15 16.15 1.2 } } ]
+  name "wall_20"
+  boundingObject Box { size 0.15 16.15 1.2 }
+  locked TRUE
+}
+Solid {
+  translation 43 3 0.6
+  children [ Shape { appearance PBRAppearance { baseColor 0.93 0.93 0.9 roughness 0.7 metalness 0 } geometry Box { size 14.15 0.15 1.2 } } ]
+  name "wall_21"
+  boundingObject Box { size 14.15 0.15 1.2 }
+  locked TRUE
+}
+Solid {
+  translation 39 19 0.6
+  children [ Shape { appearance PBRAppearance { baseColor 0.93 0.93 0.9 roughness 0.7 metalness 0 } geometry Box { size 6.15 0.15 1.2 } } ]
+  name "wall_22"
+  boundingObject Box { size 6.15 0.15 1.2 }
+  locked TRUE
+}
+Solid {
+  translation 36 33 0.6
+  children [ Shape { appearance PBRAppearance { baseColor 0.93 0.93 0.9 roughness 0.7 metalness 0 } geometry Box { size 0.15 16.15 1.2 } } ]
+  name "wall_23"
+  boundingObject Box { size 0.15 16.15 1.2 }
+  locked TRUE
+}
+Solid {
+  translation 39 25 0.6
+  children [ Shape { appearance PBRAppearance { baseColor 0.93 0.93 0.9 roughness 0.7 metalness 0 } geometry Box { size 6.15 0.15 1.2 } } ]
+  name "wall_24"
+  boundingObject Box { size 6.15 0.15 1.2 }
+  locked TRUE
+}
+Solid {
+  translation 43 41 0.6
+  children [ Shape { appearance PBRAppearance { baseColor 0.93 0.93 0.9 roughness 0.7 metalness 0 } geometry Box { size 14.15 0.15 1.2 } } ]
+  name "wall_25"
+  boundingObject Box { size 14.15 0.15 1.2 }
+  locked TRUE
+}
+Solid {
+  translation 47 19 0.6
+  children [ Shape { appearance PBRAppearance { baseColor 0.93 0.93 0.9 roughness 0.7 metalness 0 } geometry Box { size 6.15 0.15 1.2 } } ]
+  name "wall_26"
+  boundingObject Box { size 6.15 0.15 1.2 }
+  locked TRUE
+}
+Solid {
+  translation 47 25 0.6
+  children [ Shape { appearance PBRAppearance { baseColor 0.93 0.93 0.9 roughness 0.7 metalness 0 } geometry Box { size 6.15 0.15 1.2 } } ]
+  name "wall_27"
+  boundingObject Box { size 6.15 0.15 1.2 }
+  locked TRUE
+}
+Solid {
+  translation 50 11 0.6
+  children [ Shape { appearance PBRAppearance { baseColor 0.93 0.93 0.9 roughness 0.7 metalness 0 } geometry Box { size 0.15 16.15 1.2 } } ]
+  name "wall_28"
+  boundingObject Box { size 0.15 16.15 1.2 }
+  locked TRUE
+}
+Solid {
+  translation 50 33 0.6
+  children [ Shape { appearance PBRAppearance { baseColor 0.93 0.93 0.9 roughness 0.7 metalness 0 } geometry Box { size 0.15 16.15 1.2 } } ]
+  name "wall_29"
+  boundingObject Box { size 0.15 16.15 1.2 }
+  locked TRUE
+}
+Solid {
+  translation 52 11 0.6
+  children [ Shape { appearance PBRAppearance { baseColor 0.93 0.93 0.9 roughness 0.7 metalness 0 } geometry Box { size 0.15 16.15 1.2 } } ]
+  name "wall_30"
+  boundingObject Box { size 0.15 16.15 1.2 }
+  locked TRUE
+}
+Solid {
+  translation 59 3 0.6
+  children [ Shape { appearance PBRAppearance { baseColor 0.93 0.93 0.9 roughness 0.7 metalness 0 } geometry Box { size 14.15 0.15 1.2 } } ]
+  name "wall_31"
+  boundingObject Box { size 14.15 0.15 1.2 }
+  locked TRUE
+}
+Solid {
+  translation 55 19 0.6
+  children [ Shape { appearance PBRAppearance { baseColor 0.93 0.93 0.9 roughness 0.7 metalness 0 } geometry Box { size 6.15 0.15 1.2 } } ]
+  name "wall_32"
+  boundingObject Box { size 6.15 0.15 1.2 }
+  locked TRUE
+}
+Solid {
+  translation 52 33 0.6
+  children [ Shape { appearance PBRAppearance { baseColor 0.93 0.93 0.9 roughness 0.7 metalness 0 } geometry Box { size 0.15 16.15 1.2 } } ]
+  name "wall_33"
+  boundingObject Box { size 0.15 16.15 1.2 }
+  locked TRUE
+}
+Solid {
+  translation 55 25 0.6
+  children [ Shape { appearance PBRAppearance { baseColor 0.93 0.93 0.9 roughness 0.7 metalness 0 } geometry Box { size 6.15 0.15 1.2 } } ]
+  name "wall_34"
+  boundingObject Box { size 6.15 0.15 1.2 }
+  locked TRUE
+}
+Solid {
+  translation 59 41 0.6
+  children [ Shape { appearance PBRAppearance { baseColor 0.93 0.93 0.9 roughness 0.7 metalness 0 } geometry Box { size 14.15 0.15 1.2 } } ]
+  name "wall_35"
+  boundingObject Box { size 14.15 0.15 1.2 }
+  locked TRUE
+}
+Solid {
+  translation 63 19 0.6
+  children [ Shape { appearance PBRAppearance { baseColor 0.93 0.93 0.9 roughness 0.7 metalness 0 } geometry Box { size 6.15 0.15 1.2 } } ]
+  name "wall_36"
+  boundingObject Box { size 6.15 0.15 1.2 }
+  locked TRUE
+}
+Solid {
+  translation 63 25 0.6
+  children [ Shape { appearance PBRAppearance { baseColor 0.93 0.93 0.9 roughness 0.7 metalness 0 } geometry Box { size 6.15 0.15 1.2 } } ]
+  name "wall_37"
+  boundingObject Box { size 6.15 0.15 1.2 }
+  locked TRUE
+}
+Solid {
+  translation 66 11 0.6
+  children [ Shape { appearance PBRAppearance { baseColor 0.93 0.93 0.9 roughness 0.7 metalness 0 } geometry Box { size 0.15 16.15 1.2 } } ]
+  name "wall_38"
+  boundingObject Box { size 0.15 16.15 1.2 }
+  locked TRUE
+}
+Solid {
+  translation 66 33 0.6
+  children [ Shape { appearance PBRAppearance { baseColor 0.93 0.93 0.9 roughness 0.7 metalness 0 } geometry Box { size 0.15 16.15 1.2 } } ]
+  name "wall_39"
+  boundingObject Box { size 0.15 16.15 1.2 }
+  locked TRUE
+}
+Solid {
+  translation 68 11 0.6
+  children [ Shape { appearance PBRAppearance { baseColor 0.93 0.93 0.9 roughness 0.7 metalness 0 } geometry Box { size 0.15 16.15 1.2 } } ]
+  name "wall_40"
+  boundingObject Box { size 0.15 16.15 1.2 }
+  locked TRUE
+}
+Solid {
+  translation 75 3 0.6
+  children [ Shape { appearance PBRAppearance { baseColor 0.93 0.93 0.9 roughness 0.7 metalness 0 } geometry Box { size 14.15 0.15 1.2 } } ]
+  name "wall_41"
+  boundingObject Box { size 14.15 0.15 1.2 }
+  locked TRUE
+}
+Solid {
+  translation 71 19 0.6
+  children [ Shape { appearance PBRAppearance { baseColor 0.93 0.93 0.9 roughness 0.7 metalness 0 } geometry Box { size 6.15 0.15 1.2 } } ]
+  name "wall_42"
+  boundingObject Box { size 6.15 0.15 1.2 }
+  locked TRUE
+}
+Solid {
+  translation 68 33 0.6
+  children [ Shape { appearance PBRAppearance { baseColor 0.93 0.93 0.9 roughness 0.7 metalness 0 } geometry Box { size 0.15 16.15 1.2 } } ]
+  name "wall_43"
+  boundingObject Box { size 0.15 16.15 1.2 }
+  locked TRUE
+}
+Solid {
+  translation 71 25 0.6
+  children [ Shape { appearance PBRAppearance { baseColor 0.93 0.93 0.9 roughness 0.7 metalness 0 } geometry Box { size 6.15 0.15 1.2 } } ]
+  name "wall_44"
+  boundingObject Box { size 6.15 0.15 1.2 }
+  locked TRUE
+}
+Solid {
+  translation 75 41 0.6
+  children [ Shape { appearance PBRAppearance { baseColor 0.93 0.93 0.9 roughness 0.7 metalness 0 } geometry Box { size 14.15 0.15 1.2 } } ]
+  name "wall_45"
+  boundingObject Box { size 14.15 0.15 1.2 }
+  locked TRUE
+}
+Solid {
+  translation 79 19 0.6
+  children [ Shape { appearance PBRAppearance { baseColor 0.93 0.93 0.9 roughness 0.7 metalness 0 } geometry Box { size 6.15 0.15 1.2 } } ]
+  name "wall_46"
+  boundingObject Box { size 6.15 0.15 1.2 }
+  locked TRUE
+}
+Solid {
+  translation 79 25 0.6
+  children [ Shape { appearance PBRAppearance { baseColor 0.93 0.93 0.9 roughness 0.7 metalness 0 } geometry Box { size 6.15 0.15 1.2 } } ]
+  name "wall_47"
+  boundingObject Box { size 6.15 0.15 1.2 }
+  locked TRUE
+}
+Solid {
+  translation 82 11 0.6
+  children [ Shape { appearance PBRAppearance { baseColor 0.93 0.93 0.9 roughness 0.7 metalness 0 } geometry Box { size 0.15 16.15 1.2 } } ]
+  name "wall_48"
+  boundingObject Box { size 0.15 16.15 1.2 }
+  locked TRUE
+}
+Solid {
+  translation 82 33 0.6
+  children [ Shape { appearance PBRAppearance { baseColor 0.93 0.93 0.9 roughness 0.7 metalness 0 } geometry Box { size 0.15 16.15 1.2 } } ]
+  name "wall_49"
+  boundingObject Box { size 0.15 16.15 1.2 }
+  locked TRUE
+}
+Solid {
+  translation 84 11 0.6
+  children [ Shape { appearance PBRAppearance { baseColor 0.93 0.93 0.9 roughness 0.7 metalness 0 } geometry Box { size 0.15 16.15 1.2 } } ]
+  name "wall_50"
+  boundingObject Box { size 0.15 16.15 1.2 }
+  locked TRUE
+}
+Solid {
+  translation 91 3 0.6
+  children [ Shape { appearance PBRAppearance { baseColor 0.93 0.93 0.9 roughness 0.7 metalness 0 } geometry Box { size 14.15 0.15 1.2 } } ]
+  name "wall_51"
+  boundingObject Box { size 14.15 0.15 1.2 }
+  locked TRUE
+}
+Solid {
+  translation 87 19 0.6
+  children [ Shape { appearance PBRAppearance { baseColor 0.93 0.93 0.9 roughness 0.7 metalness 0 } geometry Box { size 6.15 0.15 1.2 } } ]
+  name "wall_52"
+  boundingObject Box { size 6.15 0.15 1.2 }
+  locked TRUE
+}
+Solid {
+  translation 84 33 0.6
+  children [ Shape { appearance PBRAppearance { baseColor 0.93 0.93 0.9 roughness 0.7 metalness 0 } geometry Box { size 0.15 16.15 1.2 } } ]
+  name "wall_53"
+  boundingObject Box { size 0.15 16.15 1.2 }
+  locked TRUE
+}
+Solid {
+  translation 87 25 0.6
+  children [ Shape { appearance PBRAppearance { baseColor 0.93 0.93 0.9 roughness 0.7 metalness 0 } geometry Box { size 6.15 0.15 1.2 } } ]
+  name "wall_54"
+  boundingObject Box { size 6.15 0.15 1.2 }
+  locked TRUE
+}
+Solid {
+  translation 91 41 0.6
+  children [ Shape { appearance PBRAppearance { baseColor 0.93 0.93 0.9 roughness 0.7 metalness 0 } geometry Box { size 14.15 0.15 1.2 } } ]
+  name "wall_55"
+  boundingObject Box { size 14.15 0.15 1.2 }
+  locked TRUE
+}
+Solid {
+  translation 95 19 0.6
+  children [ Shape { appearance PBRAppearance { baseColor 0.93 0.93 0.9 roughness 0.7 metalness 0 } geometry Box { size 6.15 0.15 1.2 } } ]
+  name "wall_56"
+  boundingObject Box { size 6.15 0.15 1.2 }
+  locked TRUE
+}
+Solid {
+  translation 95 25 0.6
+  children [ Shape { appearance PBRAppearance { baseColor 0.93 0.93 0.9 roughness 0.7 metalness 0 } geometry Box { size 6.15 0.15 1.2 } } ]
+  name "wall_57"
+  boundingObject Box { size 6.15 0.15 1.2 }
+  locked TRUE
+}
+Solid {
+  translation 98 11 0.6
+  children [ Shape { appearance PBRAppearance { baseColor 0.93 0.93 0.9 roughness 0.7 metalness 0 } geometry Box { size 0.15 16.15 1.2 } } ]
+  name "wall_58"
+  boundingObject Box { size 0.15 16.15 1.2 }
+  locked TRUE
+}
+Solid {
+  translation 98 33 0.6
+  children [ Shape { appearance PBRAppearance { baseColor 0.93 0.93 0.9 roughness 0.7 metalness 0 } geometry Box { size 0.15 16.15 1.2 } } ]
+  name "wall_59"
+  boundingObject Box { size 0.15 16.15 1.2 }
+  locked TRUE
+}
+Solid {
+  translation 51 0 0.6
+  children [ Shape { appearance PBRAppearance { baseColor 0.8 0.8 0.78 roughness 0.7 metalness 0 } geometry Box { size 102.15 0.15 1.2 } } ]
+  name "outer_s"
+  boundingObject Box { size 102.15 0.15 1.2 }
+  locked TRUE
+}
+Solid {
+  translation 51 44 0.6
+  children [ Shape { appearance PBRAppearance { baseColor 0.8 0.8 0.78 roughness 0.7 metalness 0 } geometry Box { size 102.15 0.15 1.2 } } ]
+  name "outer_n"
+  boundingObject Box { size 102.15 0.15 1.2 }
+  locked TRUE
+}
+Solid {
+  translation 0 22 0.6
+  children [ Shape { appearance PBRAppearance { baseColor 0.8 0.8 0.78 roughness 0.7 metalness 0 } geometry Box { size 0.15 44 1.2 } } ]
+  name "outer_w"
+  boundingObject Box { size 0.15 44 1.2 }
+  locked TRUE
+}
+Solid {
+  translation 102 22 0.6
+  children [ Shape { appearance PBRAppearance { baseColor 0.8 0.8 0.78 roughness 0.7 metalness 0 } geometry Box { size 0.15 44 1.2 } } ]
+  name "outer_e"
+  boundingObject Box { size 0.15 44 1.2 }
+  locked TRUE
+}
+Pose { translation 10.1 33 0.022 children [ Shape { appearance PBRAppearance { baseColor 1 0.85 0.1 roughness 1 metalness 0 } geometry Box { size 0.8 0.8 0.008 } } ] }
+Solid {
+  translation 10.1 33.85 0.25
+  children [ Shape { appearance PBRAppearance { baseColor 0.2 0.2 0.22 roughness 0.7 metalness 0.4 } geometry Box { size 0.9 0.15 0.5 } } ]
+  name "charger_F2_CS_PH_1"
+  boundingObject Box { size 0.9 0.15 0.5 }
+  locked TRUE
+}
+Pose { translation 11.9 33 0.022 children [ Shape { appearance PBRAppearance { baseColor 1 0.85 0.1 roughness 1 metalness 0 } geometry Box { size 0.8 0.8 0.008 } } ] }
+Solid {
+  translation 11.9 33.85 0.25
+  children [ Shape { appearance PBRAppearance { baseColor 0.2 0.2 0.22 roughness 0.7 metalness 0.4 } geometry Box { size 0.9 0.15 0.5 } } ]
+  name "charger_F2_CS_PH_2"
+  boundingObject Box { size 0.9 0.15 0.5 }
+  locked TRUE
+}
+Pose { translation 11 11 0.022 children [ Shape { appearance PBRAppearance { baseColor 1 0.85 0.1 roughness 1 metalness 0 } geometry Box { size 0.8 0.8 0.008 } } ] }
+Solid {
+  translation 11 10.15 0.25
+  children [ Shape { appearance PBRAppearance { baseColor 0.2 0.2 0.22 roughness 0.7 metalness 0.4 } geometry Box { size 0.9 0.15 0.5 } } ]
+  name "charger_F2_CS_ST_1"
+  boundingObject Box { size 0.9 0.15 0.5 }
+  locked TRUE
+}
+Pose { translation 91 11 0.022 children [ Shape { appearance PBRAppearance { baseColor 1 0.85 0.1 roughness 1 metalness 0 } geometry Box { size 0.8 0.8 0.008 } } ] }
+Solid {
+  translation 91 10.15 0.25
+  children [ Shape { appearance PBRAppearance { baseColor 0.2 0.2 0.22 roughness 0.7 metalness 0.4 } geometry Box { size 0.9 0.15 0.5 } } ]
+  name "charger_F2_CS_WS_1"
+  boundingObject Box { size 0.9 0.15 0.5 }
+  locked TRUE
+}
+Pose { translation 96.8 22 0.022 children [ Shape { appearance PBRAppearance { baseColor 0.3 0.85 0.9 roughness 1 metalness 0 } geometry Box { size 0.8 0.8 0.008 } } ] }
+Solid {
+  translation 97.65 22 0.25
+  children [ Shape { appearance PBRAppearance { baseColor 0.2 0.2 0.22 roughness 0.7 metalness 0.4 } geometry Box { size 0.15 0.9 0.5 } } ]
+  name "charger_F2_CLEAN_1"
+  boundingObject Box { size 0.15 0.9 0.5 }
+  locked TRUE
+}
+Pose { translation 29.8 25.8 0.03 rotation 1 0 0 0 children [ Shape { appearance PBRAppearance { baseColor 0.75 0.55 0.2 roughness 1 metalness 0 } geometry Cylinder { height 0.01 radius 0.35 } } ] }
+Pose { translation 45.8 25.8 0.03 rotation 1 0 0 0 children [ Shape { appearance PBRAppearance { baseColor 0.75 0.55 0.2 roughness 1 metalness 0 } geometry Cylinder { height 0.01 radius 0.35 } } ] }
+Pose { translation 61.8 25.8 0.03 rotation 1 0 0 0 children [ Shape { appearance PBRAppearance { baseColor 0.75 0.55 0.2 roughness 1 metalness 0 } geometry Cylinder { height 0.01 radius 0.35 } } ] }
+Pose { translation 77.8 25.8 0.03 rotation 1 0 0 0 children [ Shape { appearance PBRAppearance { baseColor 0.75 0.55 0.2 roughness 1 metalness 0 } geometry Cylinder { height 0.01 radius 0.35 } } ] }
+Pose { translation 61.8 18.2 0.03 rotation 1 0 0 0 children [ Shape { appearance PBRAppearance { baseColor 0.75 0.55 0.2 roughness 1 metalness 0 } geometry Cylinder { height 0.01 radius 0.35 } } ] }
+DEF MED_01 Robot {
+  translation 10.1 33 0.082
+  rotation 0 0 1 -1.5708
+  children [
+    Pose { translation 0 0 0.08 children [ Shape { appearance PBRAppearance { baseColor 0.15 0.45 0.9 roughness 0.5 metalness 0 } geometry Box { size 0.5 0.36 0.14 } } ] }
+    Pose { translation 0.245 0 0.11 children [ Shape { appearance PBRAppearance { baseColor 1 1 0.8 roughness 0.7 metalness 0 emissiveColor 0.9 0.9 0.6 } geometry Box { size 0.02 0.2 0.03 } } ] }
+    Pose { translation 0 0 0.3 children [ Shape { appearance PBRAppearance { baseColor 0.96 0.96 0.97 roughness 0.7 metalness 0 } geometry Box { size 0.4 0.32 0.3 } } ] }
+    Pose { translation 0.201 0 0.22 children [ Shape { appearance PBRAppearance { baseColor 0.15 0.45 0.9 roughness 0.7 metalness 0 } geometry Box { size 0.01 0.28 0.05 } } ] }
+    Pose { translation 0.201 0 0.285 children [ Shape { appearance PBRAppearance { baseColor 0.15 0.45 0.9 roughness 0.7 metalness 0 } geometry Box { size 0.01 0.28 0.05 } } ] }
+    Pose { translation 0.201 0 0.35 children [ Shape { appearance PBRAppearance { baseColor 0.15 0.45 0.9 roughness 0.7 metalness 0 } geometry Box { size 0.01 0.28 0.05 } } ] }
+    Pose { translation 0.201 0 0.415 children [ Shape { appearance PBRAppearance { baseColor 0.15 0.45 0.9 roughness 0.7 metalness 0 } geometry Box { size 0.01 0.28 0.05 } } ] }
+    DistanceSensor { translation 0.26 0 0.08 rotation 0 0 1 0 name "ds_front" lookupTable [ 0 0 0, 2 2 0 ] type "generic" }
+    DistanceSensor { translation 0.26 0.08 0.08 rotation 0 0 1 0.26 name "ds_front_left" lookupTable [ 0 0 0, 2 2 0 ] type "generic" }
+    DistanceSensor { translation 0.26 -0.08 0.08 rotation 0 0 1 -0.26 name "ds_front_right" lookupTable [ 0 0 0, 2 2 0 ] type "generic" }
+    DistanceSensor { translation 0.25 0.17 0.08 rotation 0 0 1 0.7 name "ds_diag_left" lookupTable [ 0 0 0, 2 2 0 ] type "generic" }
+    DistanceSensor { translation 0.25 -0.17 0.08 rotation 0 0 1 -0.7 name "ds_diag_right" lookupTable [ 0 0 0, 2 2 0 ] type "generic" }
+    DistanceSensor { translation 0.15 0.19 0.08 rotation 0 0 1 1.5708 name "ds_left" lookupTable [ 0 0 0, 2 2 0 ] type "generic" }
+    DistanceSensor { translation 0.15 -0.19 0.08 rotation 0 0 1 -1.5708 name "ds_right" lookupTable [ 0 0 0, 2 2 0 ] type "generic" }
+    LED {
+      translation -0.2 0.12 0.19
+      children [ Shape { appearance PBRAppearance { baseColor 0.9 0.9 0.9 roughness 0.3 metalness 0 emissiveColor 0 0 0 }
+                 geometry Sphere { radius 0.04 subdivision 2 } } ]
+      name "status_led"
+      color [ 0 1 0, 0 0.45 1, 1 0.8 0, 1 0 0, 1 1 1 ]
+    }
+    GPS { name "gps" }
+    Compass { name "compass" }
+    HingeJoint {
+      jointParameters HingeJointParameters { axis 0 1 0 anchor 0 0.21 0 }
+      device [ RotationalMotor { name "left_wheel_motor" maxVelocity 20 maxTorque 20 }
+               PositionSensor { name "left_wheel_sensor" } ]
+      endPoint Solid {
+        translation 0 0.21 0
+        rotation 1 0 0 1.5708
+        children [ Shape { appearance PBRAppearance { baseColor 0.08 0.08 0.08 roughness 0.9 metalness 0 } geometry Cylinder { height 0.04 radius 0.08 } } ]
+        name "left_wheel"
+        boundingObject Cylinder { height 0.04 radius 0.08 }
+        physics Physics { density -1 mass 0.8 }
+      }
+    }
+    HingeJoint {
+      jointParameters HingeJointParameters { axis 0 1 0 anchor 0 -0.21 0 }
+      device [ RotationalMotor { name "right_wheel_motor" maxVelocity 20 maxTorque 20 }
+               PositionSensor { name "right_wheel_sensor" } ]
+      endPoint Solid {
+        translation 0 -0.21 0
+        rotation 1 0 0 1.5708
+        children [ Shape { appearance PBRAppearance { baseColor 0.08 0.08 0.08 roughness 0.9 metalness 0 } geometry Cylinder { height 0.04 radius 0.08 } } ]
+        name "right_wheel"
+        boundingObject Cylinder { height 0.04 radius 0.08 }
+        physics Physics { density -1 mass 0.8 }
+      }
+    }
+    Solid {
+      translation 0.19 0 -0.04
+      children [ Shape { appearance PBRAppearance { baseColor 0.3 0.3 0.3 roughness 0.3 metalness 0.5 } geometry Sphere { radius 0.04 subdivision 2 } } ]
+      name "front_caster"
+      contactMaterial "caster"
+      boundingObject Sphere { radius 0.04 }
+      physics Physics { density -1 mass 0.1 }
+    }
+    Solid {
+      translation -0.19 0 -0.04
+      children [ Shape { appearance PBRAppearance { baseColor 0.3 0.3 0.3 roughness 0.3 metalness 0.5 } geometry Sphere { radius 0.04 subdivision 2 } } ]
+      name "rear_caster"
+      contactMaterial "caster"
+      boundingObject Sphere { radius 0.04 }
+      physics Physics { density -1 mass 0.1 }
+    }
+  ]
+  name "MED-01"
+  model "MED_CART"
+  controller "rmms_robot"
+  controllerArgs [ "--floor=F2" "--home=F2-CS-PH" "--speed=1.0" ]
+  boundingObject Pose { translation 0 0 0.08 children [ Box { size 0.5 0.36 0.14 } ] }
+  physics Physics { density -1 mass 15 centerOfMass [ 0 0 0.02 ] }
+}
+DEF MED_02 Robot {
+  translation 11.9 33 0.082
+  rotation 0 0 1 -1.5708
+  children [
+    Pose { translation 0 0 0.08 children [ Shape { appearance PBRAppearance { baseColor 0.15 0.45 0.9 roughness 0.5 metalness 0 } geometry Box { size 0.5 0.36 0.14 } } ] }
+    Pose { translation 0.245 0 0.11 children [ Shape { appearance PBRAppearance { baseColor 1 1 0.8 roughness 0.7 metalness 0 emissiveColor 0.9 0.9 0.6 } geometry Box { size 0.02 0.2 0.03 } } ] }
+    Pose { translation 0 0 0.3 children [ Shape { appearance PBRAppearance { baseColor 0.96 0.96 0.97 roughness 0.7 metalness 0 } geometry Box { size 0.4 0.32 0.3 } } ] }
+    Pose { translation 0.201 0 0.22 children [ Shape { appearance PBRAppearance { baseColor 0.15 0.45 0.9 roughness 0.7 metalness 0 } geometry Box { size 0.01 0.28 0.05 } } ] }
+    Pose { translation 0.201 0 0.285 children [ Shape { appearance PBRAppearance { baseColor 0.15 0.45 0.9 roughness 0.7 metalness 0 } geometry Box { size 0.01 0.28 0.05 } } ] }
+    Pose { translation 0.201 0 0.35 children [ Shape { appearance PBRAppearance { baseColor 0.15 0.45 0.9 roughness 0.7 metalness 0 } geometry Box { size 0.01 0.28 0.05 } } ] }
+    Pose { translation 0.201 0 0.415 children [ Shape { appearance PBRAppearance { baseColor 0.15 0.45 0.9 roughness 0.7 metalness 0 } geometry Box { size 0.01 0.28 0.05 } } ] }
+    DistanceSensor { translation 0.26 0 0.08 rotation 0 0 1 0 name "ds_front" lookupTable [ 0 0 0, 2 2 0 ] type "generic" }
+    DistanceSensor { translation 0.26 0.08 0.08 rotation 0 0 1 0.26 name "ds_front_left" lookupTable [ 0 0 0, 2 2 0 ] type "generic" }
+    DistanceSensor { translation 0.26 -0.08 0.08 rotation 0 0 1 -0.26 name "ds_front_right" lookupTable [ 0 0 0, 2 2 0 ] type "generic" }
+    DistanceSensor { translation 0.25 0.17 0.08 rotation 0 0 1 0.7 name "ds_diag_left" lookupTable [ 0 0 0, 2 2 0 ] type "generic" }
+    DistanceSensor { translation 0.25 -0.17 0.08 rotation 0 0 1 -0.7 name "ds_diag_right" lookupTable [ 0 0 0, 2 2 0 ] type "generic" }
+    DistanceSensor { translation 0.15 0.19 0.08 rotation 0 0 1 1.5708 name "ds_left" lookupTable [ 0 0 0, 2 2 0 ] type "generic" }
+    DistanceSensor { translation 0.15 -0.19 0.08 rotation 0 0 1 -1.5708 name "ds_right" lookupTable [ 0 0 0, 2 2 0 ] type "generic" }
+    LED {
+      translation -0.2 0.12 0.19
+      children [ Shape { appearance PBRAppearance { baseColor 0.9 0.9 0.9 roughness 0.3 metalness 0 emissiveColor 0 0 0 }
+                 geometry Sphere { radius 0.04 subdivision 2 } } ]
+      name "status_led"
+      color [ 0 1 0, 0 0.45 1, 1 0.8 0, 1 0 0, 1 1 1 ]
+    }
+    GPS { name "gps" }
+    Compass { name "compass" }
+    HingeJoint {
+      jointParameters HingeJointParameters { axis 0 1 0 anchor 0 0.21 0 }
+      device [ RotationalMotor { name "left_wheel_motor" maxVelocity 20 maxTorque 20 }
+               PositionSensor { name "left_wheel_sensor" } ]
+      endPoint Solid {
+        translation 0 0.21 0
+        rotation 1 0 0 1.5708
+        children [ Shape { appearance PBRAppearance { baseColor 0.08 0.08 0.08 roughness 0.9 metalness 0 } geometry Cylinder { height 0.04 radius 0.08 } } ]
+        name "left_wheel"
+        boundingObject Cylinder { height 0.04 radius 0.08 }
+        physics Physics { density -1 mass 0.8 }
+      }
+    }
+    HingeJoint {
+      jointParameters HingeJointParameters { axis 0 1 0 anchor 0 -0.21 0 }
+      device [ RotationalMotor { name "right_wheel_motor" maxVelocity 20 maxTorque 20 }
+               PositionSensor { name "right_wheel_sensor" } ]
+      endPoint Solid {
+        translation 0 -0.21 0
+        rotation 1 0 0 1.5708
+        children [ Shape { appearance PBRAppearance { baseColor 0.08 0.08 0.08 roughness 0.9 metalness 0 } geometry Cylinder { height 0.04 radius 0.08 } } ]
+        name "right_wheel"
+        boundingObject Cylinder { height 0.04 radius 0.08 }
+        physics Physics { density -1 mass 0.8 }
+      }
+    }
+    Solid {
+      translation 0.19 0 -0.04
+      children [ Shape { appearance PBRAppearance { baseColor 0.3 0.3 0.3 roughness 0.3 metalness 0.5 } geometry Sphere { radius 0.04 subdivision 2 } } ]
+      name "front_caster"
+      contactMaterial "caster"
+      boundingObject Sphere { radius 0.04 }
+      physics Physics { density -1 mass 0.1 }
+    }
+    Solid {
+      translation -0.19 0 -0.04
+      children [ Shape { appearance PBRAppearance { baseColor 0.3 0.3 0.3 roughness 0.3 metalness 0.5 } geometry Sphere { radius 0.04 subdivision 2 } } ]
+      name "rear_caster"
+      contactMaterial "caster"
+      boundingObject Sphere { radius 0.04 }
+      physics Physics { density -1 mass 0.1 }
+    }
+  ]
+  name "MED-02"
+  model "MED_CART"
+  controller "rmms_robot"
+  controllerArgs [ "--floor=F2" "--home=F2-CS-PH" "--speed=1.0" ]
+  boundingObject Pose { translation 0 0 0.08 children [ Box { size 0.5 0.36 0.14 } ] }
+  physics Physics { density -1 mass 15 centerOfMass [ 0 0 0.02 ] }
+}
+DEF SUP_01 Robot {
+  translation 11 11 0.082
+  rotation 0 0 1 1.5708
+  children [
+    Pose { translation 0 0 0.08 children [ Shape { appearance PBRAppearance { baseColor 0.15 0.65 0.35 roughness 0.5 metalness 0 } geometry Box { size 0.5 0.36 0.14 } } ] }
+    Pose { translation 0.245 0 0.11 children [ Shape { appearance PBRAppearance { baseColor 1 1 0.8 roughness 0.7 metalness 0 emissiveColor 0.9 0.9 0.6 } geometry Box { size 0.02 0.2 0.03 } } ] }
+    Pose { translation -0.2 0 0.33 children [ Shape { appearance PBRAppearance { baseColor 0.6 0.6 0.6 roughness 0.7 metalness 0.5 } geometry Box { size 0.03 0.34 0.36 } } ] }
+    Pose { translation 0 0 0.17 children [ Shape { appearance PBRAppearance { baseColor 0.3 0.3 0.3 roughness 0.7 metalness 0 } geometry Box { size 0.44 0.34 0.02 } } ] }
+    Pose { translation 0 0 0.29 children [ Shape { appearance PBRAppearance { baseColor 0.3 0.3 0.3 roughness 0.7 metalness 0 } geometry Box { size 0.44 0.34 0.02 } } ] }
+    Pose { translation 0 0 0.41 children [ Shape { appearance PBRAppearance { baseColor 0.3 0.3 0.3 roughness 0.7 metalness 0 } geometry Box { size 0.44 0.34 0.02 } } ] }
+    Pose { translation 0.02 0.03 0.23 children [ Shape { appearance PBRAppearance { baseColor 0.85 0.7 0.45 roughness 0.7 metalness 0 } geometry Box { size 0.2 0.15 0.1 } } ] }
+    DistanceSensor { translation 0.26 0 0.08 rotation 0 0 1 0 name "ds_front" lookupTable [ 0 0 0, 2 2 0 ] type "generic" }
+    DistanceSensor { translation 0.26 0.08 0.08 rotation 0 0 1 0.26 name "ds_front_left" lookupTable [ 0 0 0, 2 2 0 ] type "generic" }
+    DistanceSensor { translation 0.26 -0.08 0.08 rotation 0 0 1 -0.26 name "ds_front_right" lookupTable [ 0 0 0, 2 2 0 ] type "generic" }
+    DistanceSensor { translation 0.25 0.17 0.08 rotation 0 0 1 0.7 name "ds_diag_left" lookupTable [ 0 0 0, 2 2 0 ] type "generic" }
+    DistanceSensor { translation 0.25 -0.17 0.08 rotation 0 0 1 -0.7 name "ds_diag_right" lookupTable [ 0 0 0, 2 2 0 ] type "generic" }
+    DistanceSensor { translation 0.15 0.19 0.08 rotation 0 0 1 1.5708 name "ds_left" lookupTable [ 0 0 0, 2 2 0 ] type "generic" }
+    DistanceSensor { translation 0.15 -0.19 0.08 rotation 0 0 1 -1.5708 name "ds_right" lookupTable [ 0 0 0, 2 2 0 ] type "generic" }
+    LED {
+      translation -0.2 0.12 0.19
+      children [ Shape { appearance PBRAppearance { baseColor 0.9 0.9 0.9 roughness 0.3 metalness 0 emissiveColor 0 0 0 }
+                 geometry Sphere { radius 0.04 subdivision 2 } } ]
+      name "status_led"
+      color [ 0 1 0, 0 0.45 1, 1 0.8 0, 1 0 0, 1 1 1 ]
+    }
+    GPS { name "gps" }
+    Compass { name "compass" }
+    HingeJoint {
+      jointParameters HingeJointParameters { axis 0 1 0 anchor 0 0.21 0 }
+      device [ RotationalMotor { name "left_wheel_motor" maxVelocity 20 maxTorque 20 }
+               PositionSensor { name "left_wheel_sensor" } ]
+      endPoint Solid {
+        translation 0 0.21 0
+        rotation 1 0 0 1.5708
+        children [ Shape { appearance PBRAppearance { baseColor 0.08 0.08 0.08 roughness 0.9 metalness 0 } geometry Cylinder { height 0.04 radius 0.08 } } ]
+        name "left_wheel"
+        boundingObject Cylinder { height 0.04 radius 0.08 }
+        physics Physics { density -1 mass 0.8 }
+      }
+    }
+    HingeJoint {
+      jointParameters HingeJointParameters { axis 0 1 0 anchor 0 -0.21 0 }
+      device [ RotationalMotor { name "right_wheel_motor" maxVelocity 20 maxTorque 20 }
+               PositionSensor { name "right_wheel_sensor" } ]
+      endPoint Solid {
+        translation 0 -0.21 0
+        rotation 1 0 0 1.5708
+        children [ Shape { appearance PBRAppearance { baseColor 0.08 0.08 0.08 roughness 0.9 metalness 0 } geometry Cylinder { height 0.04 radius 0.08 } } ]
+        name "right_wheel"
+        boundingObject Cylinder { height 0.04 radius 0.08 }
+        physics Physics { density -1 mass 0.8 }
+      }
+    }
+    Solid {
+      translation 0.19 0 -0.04
+      children [ Shape { appearance PBRAppearance { baseColor 0.3 0.3 0.3 roughness 0.3 metalness 0.5 } geometry Sphere { radius 0.04 subdivision 2 } } ]
+      name "front_caster"
+      contactMaterial "caster"
+      boundingObject Sphere { radius 0.04 }
+      physics Physics { density -1 mass 0.1 }
+    }
+    Solid {
+      translation -0.19 0 -0.04
+      children [ Shape { appearance PBRAppearance { baseColor 0.3 0.3 0.3 roughness 0.3 metalness 0.5 } geometry Sphere { radius 0.04 subdivision 2 } } ]
+      name "rear_caster"
+      contactMaterial "caster"
+      boundingObject Sphere { radius 0.04 }
+      physics Physics { density -1 mass 0.1 }
+    }
+  ]
+  name "SUP-01"
+  model "SUPPLY_CART"
+  controller "rmms_robot"
+  controllerArgs [ "--floor=F2" "--home=F2-CS-ST" "--speed=0.7" ]
+  boundingObject Pose { translation 0 0 0.08 children [ Box { size 0.5 0.36 0.14 } ] }
+  physics Physics { density -1 mass 15 centerOfMass [ 0 0 0.02 ] }
+}
+DEF WASTE_01 Robot {
+  translation 91 11 0.082
+  rotation 0 0 1 1.5708
+  children [
+    Pose { translation 0 0 0.08 children [ Shape { appearance PBRAppearance { baseColor 0.55 0.42 0.28 roughness 0.5 metalness 0 } geometry Box { size 0.5 0.36 0.14 } } ] }
+    Pose { translation 0.245 0 0.11 children [ Shape { appearance PBRAppearance { baseColor 1 1 0.8 roughness 0.7 metalness 0 emissiveColor 0.9 0.9 0.6 } geometry Box { size 0.02 0.2 0.03 } } ] }
+    Pose { translation 0 0 0.31 children [ Shape { appearance PBRAppearance { baseColor 0.95 0.75 0.1 roughness 0.7 metalness 0 } geometry Cylinder { height 0.32 radius 0.16 } } ] }
+    Pose { translation 0 0 0.48 children [ Shape { appearance PBRAppearance { baseColor 0.25 0.25 0.25 roughness 0.7 metalness 0 } geometry Cylinder { height 0.03 radius 0.17 } } ] }
+    DistanceSensor { translation 0.26 0 0.08 rotation 0 0 1 0 name "ds_front" lookupTable [ 0 0 0, 2 2 0 ] type "generic" }
+    DistanceSensor { translation 0.26 0.08 0.08 rotation 0 0 1 0.26 name "ds_front_left" lookupTable [ 0 0 0, 2 2 0 ] type "generic" }
+    DistanceSensor { translation 0.26 -0.08 0.08 rotation 0 0 1 -0.26 name "ds_front_right" lookupTable [ 0 0 0, 2 2 0 ] type "generic" }
+    DistanceSensor { translation 0.25 0.17 0.08 rotation 0 0 1 0.7 name "ds_diag_left" lookupTable [ 0 0 0, 2 2 0 ] type "generic" }
+    DistanceSensor { translation 0.25 -0.17 0.08 rotation 0 0 1 -0.7 name "ds_diag_right" lookupTable [ 0 0 0, 2 2 0 ] type "generic" }
+    DistanceSensor { translation 0.15 0.19 0.08 rotation 0 0 1 1.5708 name "ds_left" lookupTable [ 0 0 0, 2 2 0 ] type "generic" }
+    DistanceSensor { translation 0.15 -0.19 0.08 rotation 0 0 1 -1.5708 name "ds_right" lookupTable [ 0 0 0, 2 2 0 ] type "generic" }
+    LED {
+      translation -0.2 0.12 0.19
+      children [ Shape { appearance PBRAppearance { baseColor 0.9 0.9 0.9 roughness 0.3 metalness 0 emissiveColor 0 0 0 }
+                 geometry Sphere { radius 0.04 subdivision 2 } } ]
+      name "status_led"
+      color [ 0 1 0, 0 0.45 1, 1 0.8 0, 1 0 0, 1 1 1 ]
+    }
+    GPS { name "gps" }
+    Compass { name "compass" }
+    HingeJoint {
+      jointParameters HingeJointParameters { axis 0 1 0 anchor 0 0.21 0 }
+      device [ RotationalMotor { name "left_wheel_motor" maxVelocity 20 maxTorque 20 }
+               PositionSensor { name "left_wheel_sensor" } ]
+      endPoint Solid {
+        translation 0 0.21 0
+        rotation 1 0 0 1.5708
+        children [ Shape { appearance PBRAppearance { baseColor 0.08 0.08 0.08 roughness 0.9 metalness 0 } geometry Cylinder { height 0.04 radius 0.08 } } ]
+        name "left_wheel"
+        boundingObject Cylinder { height 0.04 radius 0.08 }
+        physics Physics { density -1 mass 0.8 }
+      }
+    }
+    HingeJoint {
+      jointParameters HingeJointParameters { axis 0 1 0 anchor 0 -0.21 0 }
+      device [ RotationalMotor { name "right_wheel_motor" maxVelocity 20 maxTorque 20 }
+               PositionSensor { name "right_wheel_sensor" } ]
+      endPoint Solid {
+        translation 0 -0.21 0
+        rotation 1 0 0 1.5708
+        children [ Shape { appearance PBRAppearance { baseColor 0.08 0.08 0.08 roughness 0.9 metalness 0 } geometry Cylinder { height 0.04 radius 0.08 } } ]
+        name "right_wheel"
+        boundingObject Cylinder { height 0.04 radius 0.08 }
+        physics Physics { density -1 mass 0.8 }
+      }
+    }
+    Solid {
+      translation 0.19 0 -0.04
+      children [ Shape { appearance PBRAppearance { baseColor 0.3 0.3 0.3 roughness 0.3 metalness 0.5 } geometry Sphere { radius 0.04 subdivision 2 } } ]
+      name "front_caster"
+      contactMaterial "caster"
+      boundingObject Sphere { radius 0.04 }
+      physics Physics { density -1 mass 0.1 }
+    }
+    Solid {
+      translation -0.19 0 -0.04
+      children [ Shape { appearance PBRAppearance { baseColor 0.3 0.3 0.3 roughness 0.3 metalness 0.5 } geometry Sphere { radius 0.04 subdivision 2 } } ]
+      name "rear_caster"
+      contactMaterial "caster"
+      boundingObject Sphere { radius 0.04 }
+      physics Physics { density -1 mass 0.1 }
+    }
+  ]
+  name "WASTE-01"
+  model "WASTE_CART"
+  controller "rmms_robot"
+  controllerArgs [ "--floor=F2" "--home=F2-CS-WS" "--speed=0.7" ]
+  boundingObject Pose { translation 0 0 0.08 children [ Box { size 0.5 0.36 0.14 } ] }
+  physics Physics { density -1 mass 15 centerOfMass [ 0 0 0.02 ] }
+}
+DEF CLEAN_01 Robot {
+  translation 96.8 22 0.082
+  rotation 0 0 1 3.1416
+  children [
+    Pose { translation 0 0 0.08 children [ Shape { appearance PBRAppearance { baseColor 0.1 0.65 0.7 roughness 0.5 metalness 0 } geometry Box { size 0.5 0.36 0.14 } } ] }
+    Pose { translation 0.245 0 0.11 children [ Shape { appearance PBRAppearance { baseColor 1 1 0.8 roughness 0.7 metalness 0 emissiveColor 0.9 0.9 0.6 } geometry Box { size 0.02 0.2 0.03 } } ] }
+    Pose { translation 0.27 0 0 children [ Shape { appearance PBRAppearance { baseColor 0.2 0.75 0.85 roughness 0.7 metalness 0 } geometry Box { size 0.05 0.4 0.04 } } ] }
+    Pose { translation -0.05 0 0.2 children [ Shape { appearance PBRAppearance { baseColor 0.85 0.95 0.97 roughness 0.7 metalness 0 } geometry Cylinder { height 0.1 radius 0.14 } } ] }
+    DistanceSensor { translation 0.26 0 0.08 rotation 0 0 1 0 name "ds_front" lookupTable [ 0 0 0, 2 2 0 ] type "generic" }
+    DistanceSensor { translation 0.26 0.08 0.08 rotation 0 0 1 0.26 name "ds_front_left" lookupTable [ 0 0 0, 2 2 0 ] type "generic" }
+    DistanceSensor { translation 0.26 -0.08 0.08 rotation 0 0 1 -0.26 name "ds_front_right" lookupTable [ 0 0 0, 2 2 0 ] type "generic" }
+    DistanceSensor { translation 0.25 0.17 0.08 rotation 0 0 1 0.7 name "ds_diag_left" lookupTable [ 0 0 0, 2 2 0 ] type "generic" }
+    DistanceSensor { translation 0.25 -0.17 0.08 rotation 0 0 1 -0.7 name "ds_diag_right" lookupTable [ 0 0 0, 2 2 0 ] type "generic" }
+    DistanceSensor { translation 0.15 0.19 0.08 rotation 0 0 1 1.5708 name "ds_left" lookupTable [ 0 0 0, 2 2 0 ] type "generic" }
+    DistanceSensor { translation 0.15 -0.19 0.08 rotation 0 0 1 -1.5708 name "ds_right" lookupTable [ 0 0 0, 2 2 0 ] type "generic" }
+    LED {
+      translation -0.2 0.12 0.19
+      children [ Shape { appearance PBRAppearance { baseColor 0.9 0.9 0.9 roughness 0.3 metalness 0 emissiveColor 0 0 0 }
+                 geometry Sphere { radius 0.04 subdivision 2 } } ]
+      name "status_led"
+      color [ 0 1 0, 0 0.45 1, 1 0.8 0, 1 0 0, 1 1 1 ]
+    }
+    GPS { name "gps" }
+    Compass { name "compass" }
+    HingeJoint {
+      jointParameters HingeJointParameters { axis 0 1 0 anchor 0 0.21 0 }
+      device [ RotationalMotor { name "left_wheel_motor" maxVelocity 20 maxTorque 20 }
+               PositionSensor { name "left_wheel_sensor" } ]
+      endPoint Solid {
+        translation 0 0.21 0
+        rotation 1 0 0 1.5708
+        children [ Shape { appearance PBRAppearance { baseColor 0.08 0.08 0.08 roughness 0.9 metalness 0 } geometry Cylinder { height 0.04 radius 0.08 } } ]
+        name "left_wheel"
+        boundingObject Cylinder { height 0.04 radius 0.08 }
+        physics Physics { density -1 mass 0.8 }
+      }
+    }
+    HingeJoint {
+      jointParameters HingeJointParameters { axis 0 1 0 anchor 0 -0.21 0 }
+      device [ RotationalMotor { name "right_wheel_motor" maxVelocity 20 maxTorque 20 }
+               PositionSensor { name "right_wheel_sensor" } ]
+      endPoint Solid {
+        translation 0 -0.21 0
+        rotation 1 0 0 1.5708
+        children [ Shape { appearance PBRAppearance { baseColor 0.08 0.08 0.08 roughness 0.9 metalness 0 } geometry Cylinder { height 0.04 radius 0.08 } } ]
+        name "right_wheel"
+        boundingObject Cylinder { height 0.04 radius 0.08 }
+        physics Physics { density -1 mass 0.8 }
+      }
+    }
+    Solid {
+      translation 0.19 0 -0.04
+      children [ Shape { appearance PBRAppearance { baseColor 0.3 0.3 0.3 roughness 0.3 metalness 0.5 } geometry Sphere { radius 0.04 subdivision 2 } } ]
+      name "front_caster"
+      contactMaterial "caster"
+      boundingObject Sphere { radius 0.04 }
+      physics Physics { density -1 mass 0.1 }
+    }
+    Solid {
+      translation -0.19 0 -0.04
+      children [ Shape { appearance PBRAppearance { baseColor 0.3 0.3 0.3 roughness 0.3 metalness 0.5 } geometry Sphere { radius 0.04 subdivision 2 } } ]
+      name "rear_caster"
+      contactMaterial "caster"
+      boundingObject Sphere { radius 0.04 }
+      physics Physics { density -1 mass 0.1 }
+    }
+  ]
+  name "CLEAN-01"
+  model "CLEAN_BOT"
+  controller "rmms_robot"
+  controllerArgs [ "--floor=F2" "--home=F2-CLEAN" "--speed=0.5" ]
+  boundingObject Pose { translation 0 0 0.08 children [ Box { size 0.5 0.36 0.14 } ] }
+  physics Physics { density -1 mass 15 centerOfMass [ 0 0 0.02 ] }
+}

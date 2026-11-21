@@ -1,0 +1,774 @@
+{
+ "floor": "F2",
+ "source": "Sinh từ FE src/legacy/engine.js (prototype v8.2) bằng tools/fe_to_map.py — đừng sửa tay, sửa FE rồi chạy lại.",
+ "units": "m",
+ "coordinates": "x hướng đông, y hướng bắc; gốc (0,0) = góc trái-dưới khung tầng FE; 10 px FE = 1 m",
+ "size": [
+  102.0,
+  44.0
+ ],
+ "corridors": [
+  {
+   "code": "F2-CORRIDOR",
+   "name": "Hành lang chính",
+   "rect": [
+    0.0,
+    19.0,
+    102.0,
+    25.0
+   ]
+  }
+ ],
+ "locations": [
+  {
+   "code": "F2-PHARM",
+   "name": "Phòng thuốc",
+   "kind": "PHARMACY",
+   "x": 11.0,
+   "y": 25.8,
+   "rect": [
+    4.0,
+    25.0,
+    18.0,
+    41.0
+   ],
+   "door": {
+    "side": "S",
+    "x": 11.0,
+    "y": 25.0,
+    "width": 2.0
+   }
+  },
+  {
+   "code": "F2-WARD-A",
+   "name": "Khoa Nội A",
+   "kind": "DEPT",
+   "x": 27.0,
+   "y": 25.8,
+   "rect": [
+    20.0,
+    25.0,
+    34.0,
+    41.0
+   ],
+   "door": {
+    "side": "S",
+    "x": 27.0,
+    "y": 25.0,
+    "width": 2.0
+   }
+  },
+  {
+   "code": "F2-WARD-B",
+   "name": "Khoa Nội B",
+   "kind": "DEPT",
+   "x": 43.0,
+   "y": 25.8,
+   "rect": [
+    36.0,
+    25.0,
+    50.0,
+    41.0
+   ],
+   "door": {
+    "side": "S",
+    "x": 43.0,
+    "y": 25.0,
+    "width": 2.0
+   }
+  },
+  {
+   "code": "F2-PEDS",
+   "name": "Khoa Nhi",
+   "kind": "DEPT",
+   "x": 59.0,
+   "y": 25.8,
+   "rect": [
+    52.0,
+    25.0,
+    66.0,
+    41.0
+   ],
+   "door": {
+    "side": "S",
+    "x": 59.0,
+    "y": 25.0,
+    "width": 2.0
+   }
+  },
+  {
+   "code": "F2-ICU",
+   "name": "Hồi sức tích cực",
+   "kind": "DEPT",
+   "x": 75.0,
+   "y": 25.8,
+   "rect": [
+    68.0,
+    25.0,
+    82.0,
+    41.0
+   ],
+   "door": {
+    "side": "S",
+    "x": 75.0,
+    "y": 25.0,
+    "width": 2.0
+   }
+  },
+  {
+   "code": "F2-CARD",
+   "name": "Khoa Tim mạch",
+   "kind": "DEPT",
+   "x": 91.0,
+   "y": 25.8,
+   "rect": [
+    84.0,
+    25.0,
+    98.0,
+    41.0
+   ],
+   "door": {
+    "side": "S",
+    "x": 91.0,
+    "y": 25.0,
+    "width": 2.0
+   }
+  },
+  {
+   "code": "F2-STORE",
+   "name": "Kho vật tư",
+   "kind": "STORAGE",
+   "x": 11.0,
+   "y": 18.2,
+   "rect": [
+    4.0,
+    3.0,
+    18.0,
+    19.0
+   ],
+   "door": {
+    "side": "N",
+    "x": 11.0,
+    "y": 19.0,
+    "width": 2.0
+   }
+  },
+  {
+   "code": "F2-BLOOD",
+   "name": "Phòng lấy máu",
+   "kind": "SPECIMEN",
+   "x": 27.0,
+   "y": 18.2,
+   "rect": [
+    20.0,
+    3.0,
+    34.0,
+    19.0
+   ],
+   "door": {
+    "side": "N",
+    "x": 27.0,
+    "y": 19.0,
+    "width": 2.0
+   }
+  },
+  {
+   "code": "F2-LAB",
+   "name": "Phòng xét nghiệm",
+   "kind": "DEPT",
+   "x": 43.0,
+   "y": 18.2,
+   "rect": [
+    36.0,
+    3.0,
+    50.0,
+    19.0
+   ],
+   "door": {
+    "side": "N",
+    "x": 43.0,
+    "y": 19.0,
+    "width": 2.0
+   }
+  },
+  {
+   "code": "F2-SURG",
+   "name": "Khoa Ngoại tổng hợp",
+   "kind": "DEPT",
+   "x": 59.0,
+   "y": 18.2,
+   "rect": [
+    52.0,
+    3.0,
+    66.0,
+    19.0
+   ],
+   "door": {
+    "side": "N",
+    "x": 59.0,
+    "y": 19.0,
+    "width": 2.0
+   }
+  },
+  {
+   "code": "F2-RESP",
+   "name": "Khoa Hô hấp",
+   "kind": "DEPT",
+   "x": 75.0,
+   "y": 18.2,
+   "rect": [
+    68.0,
+    3.0,
+    82.0,
+    19.0
+   ],
+   "door": {
+    "side": "N",
+    "x": 75.0,
+    "y": 19.0,
+    "width": 2.0
+   }
+  },
+  {
+   "code": "F2-WASTE",
+   "name": "Trạm rác",
+   "kind": "WASTE_STATION",
+   "x": 91.0,
+   "y": 18.2,
+   "rect": [
+    84.0,
+    3.0,
+    98.0,
+    19.0
+   ],
+   "door": {
+    "side": "N",
+    "x": 91.0,
+    "y": 19.0,
+    "width": 2.0
+   }
+  },
+  {
+   "code": "F2-CS-PH",
+   "name": "Sạc · Phòng thuốc",
+   "kind": "CHARGER",
+   "x": 11.0,
+   "y": 33.0,
+   "ports": 2
+  },
+  {
+   "code": "F2-CS-ST",
+   "name": "Sạc · Kho vật tư",
+   "kind": "CHARGER",
+   "x": 11.0,
+   "y": 11.0,
+   "ports": 1
+  },
+  {
+   "code": "F2-CS-WS",
+   "name": "Sạc · Trạm rác",
+   "kind": "CHARGER",
+   "x": 91.0,
+   "y": 11.0,
+   "ports": 1
+  },
+  {
+   "code": "F2-CLEAN",
+   "name": "Trạm CLEAN cuối hành lang",
+   "kind": "CLEAN_STATION",
+   "x": 96.8,
+   "y": 22.0,
+   "ports": 1
+  },
+  {
+   "code": "F2-WP-1",
+   "name": "Rác · Nội A",
+   "kind": "WASTE_POINT",
+   "x": 29.8,
+   "y": 25.8
+  },
+  {
+   "code": "F2-WP-2",
+   "name": "Rác · Nội B",
+   "kind": "WASTE_POINT",
+   "x": 45.8,
+   "y": 25.8
+  },
+  {
+   "code": "F2-WP-3",
+   "name": "Rác · Nhi",
+   "kind": "WASTE_POINT",
+   "x": 61.8,
+   "y": 25.8
+  },
+  {
+   "code": "F2-WP-4",
+   "name": "Rác · Hồi sức",
+   "kind": "WASTE_POINT",
+   "x": 77.8,
+   "y": 25.8
+  },
+  {
+   "code": "F2-WP-5",
+   "name": "Rác · Ngoại",
+   "kind": "WASTE_POINT",
+   "x": 61.8,
+   "y": 18.2
+  },
+  {
+   "code": "F2-COR-1",
+   "name": "Hành lang đoạn 1",
+   "kind": "CORRIDOR",
+   "x": 6.0,
+   "y": 22.0
+  },
+  {
+   "code": "F2-COR-2",
+   "name": "Hành lang đoạn 2",
+   "kind": "CORRIDOR",
+   "x": 34.0,
+   "y": 22.0
+  },
+  {
+   "code": "F2-COR-3",
+   "name": "Hành lang đoạn 3",
+   "kind": "CORRIDOR",
+   "x": 66.0,
+   "y": 22.0
+  },
+  {
+   "code": "F2-COR-4",
+   "name": "Hành lang đoạn 4",
+   "kind": "CORRIDOR",
+   "x": 93.0,
+   "y": 22.0
+  }
+ ],
+ "nodes": [
+  {
+   "id": "F2-PHARM",
+   "x": 11.0,
+   "y": 25.8,
+   "real": true
+  },
+  {
+   "id": "F2-WARD-A",
+   "x": 27.0,
+   "y": 25.8,
+   "real": true
+  },
+  {
+   "id": "F2-WARD-B",
+   "x": 43.0,
+   "y": 25.8,
+   "real": true
+  },
+  {
+   "id": "F2-PEDS",
+   "x": 59.0,
+   "y": 25.8,
+   "real": true
+  },
+  {
+   "id": "F2-ICU",
+   "x": 75.0,
+   "y": 25.8,
+   "real": true
+  },
+  {
+   "id": "F2-CARD",
+   "x": 91.0,
+   "y": 25.8,
+   "real": true
+  },
+  {
+   "id": "F2-STORE",
+   "x": 11.0,
+   "y": 18.2,
+   "real": true
+  },
+  {
+   "id": "F2-BLOOD",
+   "x": 27.0,
+   "y": 18.2,
+   "real": true
+  },
+  {
+   "id": "F2-LAB",
+   "x": 43.0,
+   "y": 18.2,
+   "real": true
+  },
+  {
+   "id": "F2-SURG",
+   "x": 59.0,
+   "y": 18.2,
+   "real": true
+  },
+  {
+   "id": "F2-RESP",
+   "x": 75.0,
+   "y": 18.2,
+   "real": true
+  },
+  {
+   "id": "F2-WASTE",
+   "x": 91.0,
+   "y": 18.2,
+   "real": true
+  },
+  {
+   "id": "F2-CS-PH",
+   "x": 11.0,
+   "y": 33.0,
+   "real": true
+  },
+  {
+   "id": "F2-CS-ST",
+   "x": 11.0,
+   "y": 11.0,
+   "real": true
+  },
+  {
+   "id": "F2-CS-WS",
+   "x": 91.0,
+   "y": 11.0,
+   "real": true
+  },
+  {
+   "id": "F2-CLEAN",
+   "x": 96.8,
+   "y": 22.0,
+   "real": true
+  },
+  {
+   "id": "F2-WP-1",
+   "x": 29.8,
+   "y": 25.8,
+   "real": true
+  },
+  {
+   "id": "F2-WP-2",
+   "x": 45.8,
+   "y": 25.8,
+   "real": true
+  },
+  {
+   "id": "F2-WP-3",
+   "x": 61.8,
+   "y": 25.8,
+   "real": true
+  },
+  {
+   "id": "F2-WP-4",
+   "x": 77.8,
+   "y": 25.8,
+   "real": true
+  },
+  {
+   "id": "F2-WP-5",
+   "x": 61.8,
+   "y": 18.2,
+   "real": true
+  },
+  {
+   "id": "F2-COR-1",
+   "x": 6.0,
+   "y": 22.0,
+   "real": true
+  },
+  {
+   "id": "F2-COR-2",
+   "x": 34.0,
+   "y": 22.0,
+   "real": true
+  },
+  {
+   "id": "F2-COR-3",
+   "x": 66.0,
+   "y": 22.0,
+   "real": true
+  },
+  {
+   "id": "F2-COR-4",
+   "x": 93.0,
+   "y": 22.0,
+   "real": true
+  },
+  {
+   "id": "J:F2-PHARM",
+   "x": 11.0,
+   "y": 22.0,
+   "real": false
+  },
+  {
+   "id": "J:F2-WARD-A",
+   "x": 27.0,
+   "y": 22.0,
+   "real": false
+  },
+  {
+   "id": "J:F2-WARD-B",
+   "x": 43.0,
+   "y": 22.0,
+   "real": false
+  },
+  {
+   "id": "J:F2-PEDS",
+   "x": 59.0,
+   "y": 22.0,
+   "real": false
+  },
+  {
+   "id": "J:F2-ICU",
+   "x": 75.0,
+   "y": 22.0,
+   "real": false
+  },
+  {
+   "id": "J:F2-CARD",
+   "x": 91.0,
+   "y": 22.0,
+   "real": false
+  },
+  {
+   "id": "J:F2-STORE",
+   "x": 11.0,
+   "y": 22.0,
+   "real": false
+  },
+  {
+   "id": "J:F2-BLOOD",
+   "x": 27.0,
+   "y": 22.0,
+   "real": false
+  },
+  {
+   "id": "J:F2-LAB",
+   "x": 43.0,
+   "y": 22.0,
+   "real": false
+  },
+  {
+   "id": "J:F2-SURG",
+   "x": 59.0,
+   "y": 22.0,
+   "real": false
+  },
+  {
+   "id": "J:F2-RESP",
+   "x": 75.0,
+   "y": 22.0,
+   "real": false
+  },
+  {
+   "id": "J:F2-WASTE",
+   "x": 91.0,
+   "y": 22.0,
+   "real": false
+  }
+ ],
+ "edges": [
+  [
+   "F2-PHARM",
+   "J:F2-PHARM"
+  ],
+  [
+   "F2-WARD-A",
+   "J:F2-WARD-A"
+  ],
+  [
+   "F2-WARD-B",
+   "J:F2-WARD-B"
+  ],
+  [
+   "F2-PEDS",
+   "J:F2-PEDS"
+  ],
+  [
+   "F2-ICU",
+   "J:F2-ICU"
+  ],
+  [
+   "F2-CARD",
+   "J:F2-CARD"
+  ],
+  [
+   "F2-STORE",
+   "J:F2-STORE"
+  ],
+  [
+   "F2-BLOOD",
+   "J:F2-BLOOD"
+  ],
+  [
+   "F2-LAB",
+   "J:F2-LAB"
+  ],
+  [
+   "F2-SURG",
+   "J:F2-SURG"
+  ],
+  [
+   "F2-RESP",
+   "J:F2-RESP"
+  ],
+  [
+   "F2-WASTE",
+   "J:F2-WASTE"
+  ],
+  [
+   "F2-CS-PH",
+   "F2-PHARM"
+  ],
+  [
+   "F2-CS-ST",
+   "F2-STORE"
+  ],
+  [
+   "F2-CS-WS",
+   "F2-WASTE"
+  ],
+  [
+   "F2-WP-1",
+   "F2-WARD-A"
+  ],
+  [
+   "F2-WP-2",
+   "F2-WARD-B"
+  ],
+  [
+   "F2-WP-3",
+   "F2-PEDS"
+  ],
+  [
+   "F2-WP-4",
+   "F2-ICU"
+  ],
+  [
+   "F2-WP-5",
+   "F2-SURG"
+  ],
+  [
+   "F2-COR-1",
+   "J:F2-PHARM"
+  ],
+  [
+   "J:F2-PHARM",
+   "J:F2-STORE"
+  ],
+  [
+   "J:F2-STORE",
+   "J:F2-WARD-A"
+  ],
+  [
+   "J:F2-WARD-A",
+   "J:F2-BLOOD"
+  ],
+  [
+   "J:F2-BLOOD",
+   "F2-COR-2"
+  ],
+  [
+   "F2-COR-2",
+   "J:F2-WARD-B"
+  ],
+  [
+   "J:F2-WARD-B",
+   "J:F2-LAB"
+  ],
+  [
+   "J:F2-LAB",
+   "J:F2-PEDS"
+  ],
+  [
+   "J:F2-PEDS",
+   "J:F2-SURG"
+  ],
+  [
+   "J:F2-SURG",
+   "F2-COR-3"
+  ],
+  [
+   "F2-COR-3",
+   "J:F2-ICU"
+  ],
+  [
+   "J:F2-ICU",
+   "J:F2-RESP"
+  ],
+  [
+   "J:F2-RESP",
+   "J:F2-CARD"
+  ],
+  [
+   "J:F2-CARD",
+   "J:F2-WASTE"
+  ],
+  [
+   "J:F2-WASTE",
+   "F2-COR-4"
+  ],
+  [
+   "F2-COR-4",
+   "F2-CLEAN"
+  ]
+ ],
+ "robot_types": {
+  "MED_CART": {
+   "name": "Xe thuốc",
+   "slots": 4,
+   "slot_kg": 5.0,
+   "speed": 1.0,
+   "payload": 20.0
+  },
+  "SUPPLY_CART": {
+   "name": "Xe vật tư",
+   "slots": 3,
+   "slot_kg": 10.0,
+   "speed": 0.7,
+   "payload": 30.0
+  },
+  "WASTE_CART": {
+   "name": "Xe gom rác",
+   "slots": 0,
+   "slot_kg": 0,
+   "speed": 0.7,
+   "payload": 40.0
+  },
+  "CLEAN_BOT": {
+   "name": "Robot lau hành lang",
+   "slots": 0,
+   "slot_kg": 0,
+   "speed": 0.5,
+   "payload": 12.0
+  }
+ },
+ "robots": [
+  {
+   "id": "MED-01",
+   "type": "MED_CART",
+   "home": "F2-CS-PH"
+  },
+  {
+   "id": "MED-02",
+   "type": "MED_CART",
+   "home": "F2-CS-PH"
+  },
+  {
+   "id": "SUP-01",
+   "type": "SUPPLY_CART",
+   "home": "F2-CS-ST"
+  },
+  {
+   "id": "WASTE-01",
+   "type": "WASTE_CART",
+   "home": "F2-CS-WS"
+  },
+  {
+   "id": "CLEAN-01",
+   "type": "CLEAN_BOT",
+   "home": "F2-CLEAN"
+  }
+ ]
+}
