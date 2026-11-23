@@ -4,6 +4,12 @@
     python tools/send_order.py MED-01 F2-PHARM F2-WARD-A              # gửi lệnh kiểu HIỆN TẠI của Hải: chỉ có stops
     python tools/send_order.py MED-01 F2-PHARM F2-WARD-A --path       # gửi lệnh kiểu ĐỀ XUẤT: có path (x, y) do "backend" tính
     python tools/send_order.py MED-01 cancel                          # huỷ lệnh, robot đứng yên
+    python tools/send_order.py MED-01 confirm                         # Operator bấm "Đã lấy hàng / cho đi tiếp"
+    python tools/send_order.py MED-01 extend 120                      # Operator bấm "Chờ thêm 120 s"
+    python tools/send_order.py nurse absent NV-TEST                   # y tá giả bỏ qua việc NV-TEST (thử hết giờ)
+    python tools/send_order.py nurse normal                           # y tá giả làm bình thường lại
+
+Lệnh gửi tay có việc NV-TEST ở ngăn 1: điểm đầu y tá đặt hộp, điểm thứ hai y tá lấy hộp → xem cảm biến.
 
 Điểm đầu tiên = điểm LẤY hàng, các điểm sau = điểm GIAO. Mã điểm xem trong map/F2.json (vd F2-PHARM, F2-WARD-A, F2-ICU).
 Cần Mosquitto đang chạy (task VS Code "1. Mosquitto: bật").
@@ -44,11 +50,14 @@ def watch():
             stop = f" | ĐANG Ở điểm dừng {p['atStopSeq']}" if p.get("atStopSeq") is not None else ""
             print(f"{time.strftime('%H:%M:%S')} {p['robotId']:<9} {p['status']:<9} ({p['x']:6.2f},{p['y']:6.2f}) "
                   f"pin {p['battery']:3d}% v={p['speed']:.2f} lệnh={p.get('orderId')} tới={p.get('nextNodeId')}{stop}")
+        elif kind == "event":
+            detail = {k: v for k, v in p.items() if k not in ("robotId", "ts", "type")}
+            print(f"{time.strftime('%H:%M:%S')} {p['robotId']:<9} ★ SỰ KIỆN {p['type']}: {detail}")
         else:
             print(f"{time.strftime('%H:%M:%S')} {msg.topic}: {p.get('connection')}")
 
     c.on_message = on_msg
-    c.subscribe([("rmms/v1/+/state", 0), ("rmms/v1/+/connection", 1)])
+    c.subscribe([("rmms/v1/+/state", 0), ("rmms/v1/+/connection", 1), ("rmms/v1/+/event", 1)])
     print("Đang xem rmms/v1/+/state và /connection — Ctrl+C để thoát")
     try:
         c.loop_forever()
@@ -96,8 +105,17 @@ def plan_path(floor_map, robot_id, stops):
 def send(robot_id, stops, with_path):
     c = client(f"rmms-test-{os.getpid()}")
     c.loop_start()
+    if robot_id == "nurse":                                    # điều khiển "y tá giả" trong Webots
+        payload = {"mode": "normal"} if stops[0] == "normal" else {"absent": stops[1:] or ["all"]}
+        c.publish("rmms/sim/nurse", json.dumps(payload), qos=1).wait_for_publish(5)
+        print(f"Đã gửi rmms/sim/nurse: {payload}")
+        return
     if stops == ["cancel"]:
         payload = {"command": "CANCEL", "robotId": robot_id}
+    elif stops[0] in ("confirm", "extend"):                    # Operator bấm "Đã lấy hàng" / "Chờ thêm"
+        payload = {"command": stops[0].upper(), "robotId": robot_id}
+        if stops[0] == "extend":
+            payload["seconds"] = int(stops[1]) if len(stops) > 1 else 120
     else:
         floor = robot_id and json.load(open(os.path.join(ROOT, "map", "F2.json"), encoding="utf-8"))
         known = {n["id"] for n in floor["nodes"]}
@@ -106,9 +124,10 @@ def send(robot_id, stops, with_path):
             sys.exit(f"Không có điểm {bad} trong map/F2.json")
         payload = {
             "orderId": f"T-TEST-{time.strftime('%H%M%S')}", "robotId": robot_id, "mapVersionId": None,
-            "stops": [{"seq": i, "nodeId": s, "action": "PICKUP" if i == 1 else "DELIVER", "taskIds": []}
+            "stops": [{"seq": i, "nodeId": s, "action": "PICKUP" if i == 1 else "DELIVER",
+                       "taskIds": ["NV-TEST"] if i in (1, 2) else []}
                       for i, s in enumerate(stops, 1)],
-            "compartments": [],
+            "compartments": [{"slot": 1, "taskId": "NV-TEST", "item": "TH-TEST", "qty": 1}],
         }
         if with_path:
             payload["path"] = plan_path(floor, robot_id, stops)

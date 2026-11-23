@@ -148,19 +148,45 @@ def caster(name, x):
     }}"""
 
 
+def tray_z(rtype):
+    """Độ cao mặt khay ngăn hàng (nóc tủ thuốc / tầng trên cùng của kệ vật tư)."""
+    top = BODY_Z + BODY[2] / 2
+    return top + (0.30 if rtype == "MED_CART" else 0.30)
+
+
+def slot_x(i, slots):
+    """Tâm ngăn thứ i (1..slots) dọc theo thân xe."""
+    cell = 0.40 / slots
+    return -0.20 + cell * (i - 0.5)
+
+
+def compartments(robot, rtype, slots, color):
+    """Khay ngăn hàng: mỗi ngăn có vách + 1 cảm biến khoảng cách chiếu LÊN.
+    Có hộp hàng trong ngăn → cảm biến đo ~0.01 m; ngăn trống → đo tối đa 0.30 m.
+    Cảm biến có DEF SLOT_<i> để 'y tá giả' (rmms_nurse) biết đặt hộp vào đâu."""
+    if slots <= 0:
+        return []
+    z, cell = tray_z(rtype), 0.40 / slots
+    parts = [pose((0, 0, z - 0.005), box((0.42, 0.32, 0.01), (0.25, 0.27, 0.30)))]        # mặt khay
+    for i in range(slots + 1):                                                         # vách ngăn
+        parts.append(pose((-0.20 + i * cell, 0, z + 0.03), box((0.008, 0.32, 0.06), color)))
+    for i in range(1, slots + 1):
+        x = slot_x(i, slots)
+        parts.append(pose((x, -0.13, z + 0.002), box((cell * 0.6, 0.03, 0.004), (1, 1, 1),
+                                                        emissive=(0.3, 0.3, 0.3))))   # vạch số ngăn
+        parts.append(f'DEF SLOT_{i} DistanceSensor {{ translation {vec(x, 0, z + 0.001)} rotation 0 1 0 -1.5708 '
+                     f'name "slot_{i}" lookupTable [ 0 0 0, 0.3 0.3 0 ] type "generic" }}')
+    return parts
+
+
 def robot_top(rtype, color, slots):
     top = BODY_Z + BODY[2] / 2
-    if rtype == "MED_CART":          # tủ có ngăn khoá, mỗi ngăn một vạch màu
-        parts = [pose((0, 0, top + 0.15), box((0.40, 0.32, 0.30), (0.96, 0.96, 0.97)))]
-        for i in range(max(1, slots)):
-            z = top + 0.04 + i * (0.26 / max(1, slots))
-            parts.append(pose((0.201, 0, z + 0.03), box((0.01, 0.28, 0.05), color)))
-        return parts
-    if rtype == "SUPPLY_CART":       # kệ nhiều tầng
-        parts = [pose((-0.2, 0, top + 0.18), box((0.03, 0.34, 0.36), (0.6, 0.6, 0.6), metal=0.5))]
-        for i in range(max(1, slots)):
-            parts.append(pose((0, 0, top + 0.02 + i * 0.12), box((0.44, 0.34, 0.02), (0.3, 0.3, 0.3))))
-        parts.append(pose((0.02, 0.03, top + 0.08), box((0.2, 0.15, 0.1), (0.85, 0.7, 0.45))))
+    if rtype == "MED_CART":          # tủ thuốc, nóc tủ là khay ngăn hàng
+        return [pose((0, 0, top + 0.15), box((0.40, 0.32, 0.30), (0.96, 0.96, 0.97)))]
+    if rtype == "SUPPLY_CART":       # kệ vật tư, tầng trên cùng là khay ngăn hàng
+        parts = [pose((-0.2, 0, top + 0.15), box((0.03, 0.34, 0.30), (0.6, 0.6, 0.6), metal=0.5))]
+        for zz in (0.02, 0.15):
+            parts.append(pose((0, 0, top + zz), box((0.44, 0.34, 0.02), (0.3, 0.3, 0.3))))
         return parts
     if rtype == "WASTE_CART":        # thùng rác có nắp
         return [pose((0, 0, top + 0.16), cyl(0.32, 0.16, (0.95, 0.75, 0.10))),
@@ -177,6 +203,7 @@ def robot_node(robot, rtype_cfg, x, y, yaw):
     children = [pose((0, 0, BODY_Z), box(BODY, color, rough=0.5)),
                 pose((BODY[0] / 2 - 0.005, 0, BODY_Z + 0.03), box((0.02, 0.2, 0.03), (1, 1, 0.8), emissive=(0.9, 0.9, 0.6)))]
     children += robot_top(rtype, color, rtype_cfg.get("slots", 0))
+    children += compartments(robot, rtype, rtype_cfg.get("slots", 0), color)
     children += [
         distance_sensor("ds_front", BODY[0] / 2 + 0.01, 0, 0),
         distance_sensor("ds_front_left", BODY[0] / 2 + 0.01, 0.08, 0.26),
@@ -351,6 +378,13 @@ def build():
         if i >= len(slots):                          # nhiều robot hơn số cổng: đứng chờ cạnh trạm
             x += 1.2 * (i - len(slots) + 1)
         out.append(robot_node(robot, data["robot_types"].get(robot["type"], {}), x, y, yaw))
+
+    # "y tá giả": không có thân, chỉ là bộ điều khiển supervisor — đặt/lấy hộp hàng vào ngăn robot
+    out.append("""DEF NURSE Robot {
+  name "NURSE"
+  controller "rmms_nurse"
+  supervisor TRUE
+}""")
 
     os.makedirs(os.path.dirname(WORLD), exist_ok=True)
     with open(WORLD, "w", encoding="utf-8", newline="\n") as fh:

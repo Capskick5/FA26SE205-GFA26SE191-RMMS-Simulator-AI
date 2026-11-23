@@ -31,12 +31,31 @@ if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+
+
+class _Tee:
+    """RMMS_LOG=1 → in ra console Webots VÀ ghi thêm vào simulator/logs/<robot>.log (để xem lại sau)."""
+    def __init__(self, name):
+        os.makedirs(os.path.join(ROOT, "logs"), exist_ok=True)
+        self.f = open(os.path.join(ROOT, "logs", f"{name}.log"), "a", encoding="utf-8", buffering=1)
+        self.out = sys.stdout
+
+    def write(self, s):
+        self.out.write(s)
+        self.f.write(s)
+
+    def flush(self):
+        self.out.flush()
 MQTT_HOST = os.environ.get("MQTT_HOST", "127.0.0.1")
 MQTT_PORT = int(os.environ.get("MQTT_PORT", "1883"))
 
 WHEEL_R, TRACK, MAX_WHEEL = 0.08, 0.42, 20.0
 STOP_TOL, PASS_TOL = 0.25, 0.45       # sai số khi tới điểm dừng / điểm đi ngang (m)
-DWELL_S = 5.0                         # đứng ở điểm dừng bao lâu (tạm: sau này chờ xác nhận / sensor ngăn)
+DWELL_S = 5.0                         # lệnh KHÔNG có compartments (vd gửi tay) → đứng cứng 5 s như cũ
+SLOT_FULL_M = 0.10                    # cảm biến ngăn đo < 0.10 m = có hộp hàng; ngăn trống đo 0.30 m
+CLOSE_S = 1.5                         # cảm biến xác nhận xong → chờ 1.5 s (đóng ngăn) rồi mới đi
+TIMEOUT_BY_ITEM = {"TH": 180, "VT": 300, "MAU": 120}   # hết giờ chờ (giây) theo loại hàng — Prototype v8.2
+GRACE_S = 120                         # hết giờ → báo Operator; im lặng thêm 2 phút thì robot tự đi tiếp
 BATTERY_PER_M = 0.15                  # % pin mỗi mét
 CHARGE_PER_S = 1.0                    # % pin mỗi giây khi sạc
 SENSORS = ("ds_front", "ds_front_left", "ds_front_right", "ds_diag_left", "ds_diag_right", "ds_left", "ds_right")
@@ -129,6 +148,12 @@ class Radio:
         if self.online:
             self.client.publish(f"rmms/v1/{self.rid}/state", json.dumps(payload), qos=0)
 
+    def send_event(self, payload):
+        """Sự kiện một lần (cảm biến ngăn đổi, hết giờ chờ...) — QoS 1 để backend không bỏ sót."""
+        if self.online:
+            self.client.publish(f"rmms/v1/{self.rid}/event",
+                                json.dumps({"robotId": self.rid, "ts": now_iso(), **payload}), qos=1)
+
 
 # ============================================================ chạy theo điểm + né vật cản
 class Driver:
@@ -217,6 +242,8 @@ class RmmsRobot:
         self.step_ms = int(self.robot.getBasicTimeStep())
         self.dt = self.step_ms / 1000.0
         self.rid = self.robot.getName()
+        if os.environ.get("RMMS_LOG"):
+            sys.stdout = _Tee(self.rid)
         self.floor, self.home_node = arg("floor", "F2"), arg("home", "")
         self.speed = float(arg("speed", "1.0"))
         self.gps, self.compass = self.robot.getDevice("gps"), self.robot.getDevice("compass")
@@ -238,6 +265,86 @@ class RmmsRobot:
         self.at_stop = None
         self.home_xy = None
         self.next_state = 0.0
+
+        # cảm biến ngăn hàng: thiết bị tên slot_1, slot_2... (build_world.py gắn trên khay)
+        self.slots = {}
+        for k in range(self.robot.getNumberOfDevices()):
+            dev = self.robot.getDeviceByIndex(k)
+            if dev.getName().startswith("slot_"):
+                dev.enable(self.step_ms)
+                self.slots[int(dev.getName()[5:])] = dev
+        self.slot_full = {i: False for i in self.slots}
+        self.slot_dist = {i: 0.3 for i in self.slots}
+        self.slot_votes = {i: 0 for i in self.slots}
+        self.task_slot, self.task_item, self.stop_info = {}, {}, {}
+        self.wait = None                   # đang chờ cảm biến ở điểm dừng (xem start_wait)
+
+    # ---- cảm biến ngăn hàng ------------------------------------------------
+    def read_slots(self):
+        """Đọc cảm biến từng ngăn. Ngăn nào đổi trạng thái thì in ra + báo backend."""
+        for i, dev in self.slots.items():
+            v = dev.getValue()
+            v = 0.3 if math.isnan(v) else v
+            raw = v < SLOT_FULL_M
+            self.slot_votes[i] = self.slot_votes[i] + 1 if raw != self.slot_full[i] else 0
+            full = raw if self.slot_votes[i] >= 3 else self.slot_full[i]   # chống nhiễu: 3 lần liền mới tin
+            if full != self.slot_full[i]:
+                self.slot_votes[i] = 0
+                print(f"[{self.rid}] CẢM BIẾN ngăn {i}: {'TRỐNG → CÓ HÀNG' if full else 'CÓ HÀNG → TRỐNG'}"
+                      f"  (khoảng cách đo được {self.slot_dist[i]:.2f} m → {v:.2f} m)", flush=True)
+                self.radio.send_event({"type": "SLOT", "slot": i, "occupied": full, "distanceM": round(v, 3),
+                                       "taskId": self._slot_task(i)})
+                self.slot_dist[i] = v                  # số đo lúc trạng thái ổn định gần nhất
+            self.slot_full[i] = full
+
+    def _slot_task(self, slot):
+        return next((t for t, s in self.task_slot.items() if s == slot), None)
+
+    def start_wait(self, seq):
+        """Tới điểm dừng: nếu biết việc nào nằm ngăn nào thì CHỜ CẢM BIẾN, không thì đứng cứng 5 s."""
+        stop = self.stop_info.get(seq) or {}
+        tasks = [t for t in stop.get("taskIds", []) if self.task_slot.get(t) in self.slots]
+        if not tasks:
+            self.wait, self.dwell_left = None, DWELL_S
+            return f"chờ {DWELL_S:.0f} s (lệnh không có compartments)"
+        load = str(stop.get("action", "")).upper().startswith("PICK")
+        timeout = stop.get("timeoutSec") or min(
+            TIMEOUT_BY_ITEM.get(str(self.task_item.get(t) or "").split("-")[0], 180) for t in tasks)
+        self.wait = {"seq": seq, "load": load, "tasks": tasks, "slots": [self.task_slot[t] for t in tasks],
+                     "phase": "WAITING", "left": float(timeout), "confirmedBy": None,
+                     "grace": float(stop.get("graceSec") or GRACE_S)}
+        return (f"chờ y tá {'ĐẶT hàng vào' if load else 'LẤY hàng ra khỏi'} ngăn "
+                f"{', '.join(map(str, self.wait['slots']))} (hết giờ sau {timeout:.0f} s)")
+
+    def update_wait(self):
+        """Gọi mỗi bước khi đang AT_STOP có chờ cảm biến. Trả True khi được phép đi tiếp."""
+        w = self.wait
+        missing = [t for t in w["tasks"] if self.slot_full[self.task_slot[t]] != w["load"]]
+        if w["phase"] == "CLOSING":
+            w["left"] -= self.dt
+            return w["left"] <= 0
+        if not missing or w["confirmedBy"]:
+            by = w["confirmedBy"] or "SENSOR"
+            print(f"[{self.rid}] {'CẢM BIẾN xác nhận' if by == 'SENSOR' else 'OPERATOR bấm xác nhận'}: "
+                  f"đã {'lấy đủ hàng' if w['load'] else 'giao xong, ngăn trống'} → đóng ngăn, đi tiếp", flush=True)
+            self.radio.send_event({"type": "STOP_DONE", "stopSeq": w["seq"], "by": by, "taskIds": w["tasks"],
+                                   "action": "PICKUP" if w["load"] else "DELIVER"})
+            w["phase"], w["left"] = "CLOSING", CLOSE_S
+            return False
+        w["left"] -= self.dt
+        if w["left"] > 0:
+            return False
+        if w["phase"] == "WAITING":                    # hết giờ lần 1 → báo Operator, chờ thêm 2 phút
+            kind = "PICKUP_SHORT" if w["load"] else "NOT_RECEIVED"
+            print(f"[{self.rid}] HẾT GIỜ CHỜ ở điểm {w['seq']}: {kind} {missing} → báo Operator "
+                  f"(xác nhận / chờ thêm), im lặng {w['grace']:.0f} s thì tự đi", flush=True)
+            self.radio.send_event({"type": kind, "stopSeq": w["seq"], "taskIds": missing})
+            w["phase"], w["left"] = "TIMEOUT", w["grace"]
+            return False
+        kind = "PICKUP_FAILED" if w["load"] else "DELIVERY_FAILED"   # hết cả 2 phút → tự đi, hàng mang về
+        print(f"[{self.rid}] Không ai xử lý: {kind} {missing} → tự đi tiếp", flush=True)
+        self.radio.send_event({"type": kind, "stopSeq": w["seq"], "taskIds": missing})
+        return True
 
     # ---- vị trí ----------------------------------------------------------
     def sense(self):
@@ -275,11 +382,21 @@ class RmmsRobot:
         except ValueError:
             print(f"[{self.rid}] Bỏ qua lệnh không phải JSON", flush=True)
             return
-        if str(o.get("command", "")).upper() in ("CANCEL", "STOP"):
-            self.path, self.i, self.order_id = [], 0, None
+        cmd = str(o.get("command", "")).upper()
+        if cmd in ("CANCEL", "STOP"):
+            self.path, self.i, self.order_id, self.wait = [], 0, None, None
             self.status = "IDLE"
             self.drive.stop()
             print(f"[{self.rid}] Huỷ lệnh, đứng yên", flush=True)
+            return
+        if cmd == "CONFIRM":                            # Operator bấm "Đã lấy hàng" / "Cho đi tiếp"
+            if self.wait:
+                self.wait["confirmedBy"] = "OPERATOR"
+            return
+        if cmd == "EXTEND":                             # Operator bấm "Chờ thêm"
+            if self.wait and self.wait["phase"] == "TIMEOUT":
+                self.wait["phase"], self.wait["left"] = "WAITING", float(o.get("seconds", 120))
+                print(f"[{self.rid}] Operator cho chờ thêm {self.wait['left']:.0f} s", flush=True)
             return
         try:
             path = self.path_from_order(o)
@@ -290,7 +407,10 @@ class RmmsRobot:
         if not path:
             print(f"[{self.rid}] Lệnh không có điểm nào", flush=True)
             return
-        self.order_id, self.path, self.i, self.at_stop = o.get("orderId"), path, 0, None
+        self.order_id, self.path, self.i, self.at_stop, self.wait = o.get("orderId"), path, 0, None, None
+        self.task_slot = {c["taskId"]: int(c["slot"]) for c in o.get("compartments", []) if c.get("taskId")}
+        self.task_item = {c["taskId"]: c.get("item") for c in o.get("compartments", []) if c.get("taskId")}
+        self.stop_info = {s.get("seq"): s for s in o.get("stops", [])}
         self.status = "MOVING"
         kind = "path (backend tính đường)" if o.get("path") else "stops (robot tự tìm đường)"
         print(f"[{self.rid}] NHẬN LỆNH {self.order_id} kiểu {kind}: "
@@ -314,9 +434,13 @@ class RmmsRobot:
         self.battery = max(0.0, self.battery - BATTERY_PER_M * moved)
         if self.status == "AT_STOP":
             self.drive.stop()
-            self.dwell_left -= self.dt
-            if self.dwell_left <= 0:
-                self.status, self.at_stop = "MOVING", None
+            if self.wait:                                # chờ cảm biến ngăn hàng
+                go = self.update_wait()
+            else:                                        # không có thông tin ngăn → đứng cứng 5 s
+                self.dwell_left -= self.dt
+                go = self.dwell_left <= 0
+            if go:
+                self.status, self.at_stop, self.wait = "MOVING", None, None
                 self.i += 1
                 self._after_point()
             return
@@ -329,9 +453,9 @@ class RmmsRobot:
         d = self.drive.toward(self.x, self.y, self.th, tx, ty, self.speed, stop is not None or last, moved)
         if d < tol:
             if stop is not None and self.status == "MOVING":
-                self.status, self.at_stop, self.dwell_left = "AT_STOP", stop, DWELL_S
+                self.status, self.at_stop = "AT_STOP", stop
                 self.drive.stop()
-                print(f"[{self.rid}] TỚI điểm dừng {stop}: {nid} — chờ {DWELL_S:.0f} s", flush=True)
+                print(f"[{self.rid}] TỚI điểm dừng {stop}: {nid} — {self.start_wait(stop)}", flush=True)
                 self.send_state()
                 return
             self.i += 1
@@ -355,6 +479,12 @@ class RmmsRobot:
             "x": round(self.x, 2), "y": round(self.y, 2), "theta": round(self.th, 3),
             "battery": int(round(self.battery)), "speed": round(self.speed_now, 2),
             "status": self.status, "orderId": self.order_id, "nextNodeId": nxt, "atStopSeq": self.at_stop,
+            # THÊM (22/11): trạng thái từng ngăn theo cảm biến + đang chờ gì ở điểm dừng
+            "compartments": [{"slot": i, "occupied": self.slot_full[i], "taskId": self._slot_task(i)}
+                             for i in sorted(self.slots)],
+            "wait": None if not self.wait else {
+                "stopSeq": self.wait["seq"], "expect": "LOAD" if self.wait["load"] else "UNLOAD",
+                "slots": self.wait["slots"], "phase": self.wait["phase"], "leftSec": round(self.wait["left"])},
         })
 
     def run(self):
@@ -365,10 +495,14 @@ class RmmsRobot:
         print(f"[{self.rid}] SẴN SÀNG tại {self.home_node} ({self.x:.2f}, {self.y:.2f}) tầng {self.floor}", flush=True)
         while self.robot.step(self.step_ms) != -1:
             moved = self.sense()
+            self.read_slots()
             while not self.radio.inbox.empty():
                 self.handle(self.radio.inbox.get())
             self.update(moved)
-            self.led.set(LED.get(self.status, 1))
+            led = LED.get(self.status, 1)
+            if self.wait:                                 # trắng = đang chờ hàng; đỏ = hết giờ chờ
+                led = 4 if self.wait["phase"] == "TIMEOUT" else 5
+            self.led.set(led)
             t = self.robot.getTime()
             if t >= self.next_state:
                 self.next_state = t + 1.0

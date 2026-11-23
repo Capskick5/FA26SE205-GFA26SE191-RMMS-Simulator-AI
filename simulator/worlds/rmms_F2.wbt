@@ -548,10 +548,20 @@ DEF MED_01 Robot {
     Pose { translation 0 0 0.08 children [ Shape { appearance PBRAppearance { baseColor 0.15 0.45 0.9 roughness 0.5 metalness 0 } geometry Box { size 0.5 0.36 0.14 } } ] }
     Pose { translation 0.245 0 0.11 children [ Shape { appearance PBRAppearance { baseColor 1 1 0.8 roughness 0.7 metalness 0 emissiveColor 0.9 0.9 0.6 } geometry Box { size 0.02 0.2 0.03 } } ] }
     Pose { translation 0 0 0.3 children [ Shape { appearance PBRAppearance { baseColor 0.96 0.96 0.97 roughness 0.7 metalness 0 } geometry Box { size 0.4 0.32 0.3 } } ] }
-    Pose { translation 0.201 0 0.22 children [ Shape { appearance PBRAppearance { baseColor 0.15 0.45 0.9 roughness 0.7 metalness 0 } geometry Box { size 0.01 0.28 0.05 } } ] }
-    Pose { translation 0.201 0 0.285 children [ Shape { appearance PBRAppearance { baseColor 0.15 0.45 0.9 roughness 0.7 metalness 0 } geometry Box { size 0.01 0.28 0.05 } } ] }
-    Pose { translation 0.201 0 0.35 children [ Shape { appearance PBRAppearance { baseColor 0.15 0.45 0.9 roughness 0.7 metalness 0 } geometry Box { size 0.01 0.28 0.05 } } ] }
-    Pose { translation 0.201 0 0.415 children [ Shape { appearance PBRAppearance { baseColor 0.15 0.45 0.9 roughness 0.7 metalness 0 } geometry Box { size 0.01 0.28 0.05 } } ] }
+    Pose { translation 0 0 0.445 children [ Shape { appearance PBRAppearance { baseColor 0.25 0.27 0.3 roughness 0.7 metalness 0 } geometry Box { size 0.42 0.32 0.01 } } ] }
+    Pose { translation -0.2 0 0.48 children [ Shape { appearance PBRAppearance { baseColor 0.15 0.45 0.9 roughness 0.7 metalness 0 } geometry Box { size 0.008 0.32 0.06 } } ] }
+    Pose { translation -0.1 0 0.48 children [ Shape { appearance PBRAppearance { baseColor 0.15 0.45 0.9 roughness 0.7 metalness 0 } geometry Box { size 0.008 0.32 0.06 } } ] }
+    Pose { translation 0 0 0.48 children [ Shape { appearance PBRAppearance { baseColor 0.15 0.45 0.9 roughness 0.7 metalness 0 } geometry Box { size 0.008 0.32 0.06 } } ] }
+    Pose { translation 0.1 0 0.48 children [ Shape { appearance PBRAppearance { baseColor 0.15 0.45 0.9 roughness 0.7 metalness 0 } geometry Box { size 0.008 0.32 0.06 } } ] }
+    Pose { translation 0.2 0 0.48 children [ Shape { appearance PBRAppearance { baseColor 0.15 0.45 0.9 roughness 0.7 metalness 0 } geometry Box { size 0.008 0.32 0.06 } } ] }
+    Pose { translation -0.15 -0.13 0.452 children [ Shape { appearance PBRAppearance { baseColor 1 1 1 roughness 0.7 metalness 0 emissiveColor 0.3 0.3 0.3 } geometry Box { size 0.06 0.03 0.004 } } ] }
+    DEF SLOT_1 DistanceSensor { translation -0.15 0 0.451 rotation 0 1 0 -1.5708 name "slot_1" lookupTable [ 0 0 0, 0.3 0.3 0 ] type "generic" }
+    Pose { translation -0.05 -0.13 0.452 children [ Shape { appearance PBRAppearance { baseColor 1 1 1 roughness 0.7 metalness 0 emissiveColor 0.3 0.3 0.3 } geometry Box { size 0.06 0.03 0.004 } } ] }
+    DEF SLOT_2 DistanceSensor { translation -0.05 0 0.451 rotation 0 1 0 -1.5708 name "slot_2" lookupTable [ 0 0 0, 0.3 0.3 0 ] type "generic" }
+    Pose { translation 0.05 -0.13 0.452 children [ Shape { appearance PBRAppearance { baseColor 1 1 1 roughness 0.7 metalness 0 emissiveColor 0.3 0.3 0.3 } geometry Box { size 0.06 0.03 0.004 } } ] }
+    DEF SLOT_3 DistanceSensor { translation 0.05 0 0.451 rotation 0 1 0 -1.5708 name "slot_3" lookupTable [ 0 0 0, 0.3 0.3 0 ] type "generic" }
+    Pose { translation 0.15 -0.13 0.452 children [ Shape { appearance PBRAppearance { baseColor 1 1 1 roughness 0.7 metalness 0 emissiveColor 0.3 0.3 0.3 } geometry Box { size 0.06 0.03 0.004 } } ] }
+    DEF SLOT_4 DistanceSensor { translation 0.15 0 0.451 rotation 0 1 0 -1.5708 name "slot_4" lookupTable [ 0 0 0, 0.3 0.3 0 ] type "generic" }
     DistanceSensor { translation 0.26 0 0.08 rotation 0 0 1 0 name "ds_front" lookupTable [ 0 0 0, 2 2 0 ] type "generic" }
     DistanceSensor { translation 0.26 0.08 0.08 rotation 0 0 1 0.26 name "ds_front_left" lookupTable [ 0 0 0, 2 2 0 ] type "generic" }
     DistanceSensor { translation 0.26 -0.08 0.08 rotation 0 0 1 -0.26 name "ds_front_right" lookupTable [ 0 0 0, 2 2 0 ] type "generic" }
@@ -625,10 +635,20 @@ DEF MED_02 Robot {
     Pose { translation 0 0 0.08 children [ Shape { appearance PBRAppearance { baseColor 0.15 0.45 0.9 roughness 0.5 metalness 0 } geometry Box { size 0.5 0.36 0.14 } } ] }
     Pose { translation 0.245 0 0.11 children [ Shape { appearance PBRAppearance { baseColor 1 1 0.8 roughness 0.7 metalness 0 emissiveColor 0.9 0.9 0.6 } geometry Box { size 0.02 0.2 0.03 } } ] }
     Pose { translation 0 0 0.3 children [ Shape { appearance PBRAppearance { baseColor 0.96 0.96 0.97 roughness 0.7 metalness 0 } geometry Box { size 0.4 0.32 0.3 } } ] }
-    Pose { translation 0.201 0 0.22 children [ Shape { appearance PBRAppearance { baseColor 0.15 0.45 0.9 roughness 0.7 metalness 0 } geometry Box { size 0.01 0.28 0.05 } } ] }
-    Pose { translation 0.201 0 0.285 children [ Shape { appearance PBRAppearance { baseColor 0.15 0.45 0.9 roughness 0.7 metalness 0 } geometry Box { size 0.01 0.28 0.05 } } ] }
-    Pose { translation 0.201 0 0.35 children [ Shape { appearance PBRAppearance { baseColor 0.15 0.45 0.9 roughness 0.7 metalness 0 } geometry Box { size 0.01 0.28 0.05 } } ] }
-    Pose { translation 0.201 0 0.415 children [ Shape { appearance PBRAppearance { baseColor 0.15 0.45 0.9 roughness 0.7 metalness 0 } geometry Box { size 0.01 0.28 0.05 } } ] }
+    Pose { translation 0 0 0.445 children [ Shape { appearance PBRAppearance { baseColor 0.25 0.27 0.3 roughness 0.7 metalness 0 } geometry Box { size 0.42 0.32 0.01 } } ] }
+    Pose { translation -0.2 0 0.48 children [ Shape { appearance PBRAppearance { baseColor 0.15 0.45 0.9 roughness 0.7 metalness 0 } geometry Box { size 0.008 0.32 0.06 } } ] }
+    Pose { translation -0.1 0 0.48 children [ Shape { appearance PBRAppearance { baseColor 0.15 0.45 0.9 roughness 0.7 metalness 0 } geometry Box { size 0.008 0.32 0.06 } } ] }
+    Pose { translation 0 0 0.48 children [ Shape { appearance PBRAppearance { baseColor 0.15 0.45 0.9 roughness 0.7 metalness 0 } geometry Box { size 0.008 0.32 0.06 } } ] }
+    Pose { translation 0.1 0 0.48 children [ Shape { appearance PBRAppearance { baseColor 0.15 0.45 0.9 roughness 0.7 metalness 0 } geometry Box { size 0.008 0.32 0.06 } } ] }
+    Pose { translation 0.2 0 0.48 children [ Shape { appearance PBRAppearance { baseColor 0.15 0.45 0.9 roughness 0.7 metalness 0 } geometry Box { size 0.008 0.32 0.06 } } ] }
+    Pose { translation -0.15 -0.13 0.452 children [ Shape { appearance PBRAppearance { baseColor 1 1 1 roughness 0.7 metalness 0 emissiveColor 0.3 0.3 0.3 } geometry Box { size 0.06 0.03 0.004 } } ] }
+    DEF SLOT_1 DistanceSensor { translation -0.15 0 0.451 rotation 0 1 0 -1.5708 name "slot_1" lookupTable [ 0 0 0, 0.3 0.3 0 ] type "generic" }
+    Pose { translation -0.05 -0.13 0.452 children [ Shape { appearance PBRAppearance { baseColor 1 1 1 roughness 0.7 metalness 0 emissiveColor 0.3 0.3 0.3 } geometry Box { size 0.06 0.03 0.004 } } ] }
+    DEF SLOT_2 DistanceSensor { translation -0.05 0 0.451 rotation 0 1 0 -1.5708 name "slot_2" lookupTable [ 0 0 0, 0.3 0.3 0 ] type "generic" }
+    Pose { translation 0.05 -0.13 0.452 children [ Shape { appearance PBRAppearance { baseColor 1 1 1 roughness 0.7 metalness 0 emissiveColor 0.3 0.3 0.3 } geometry Box { size 0.06 0.03 0.004 } } ] }
+    DEF SLOT_3 DistanceSensor { translation 0.05 0 0.451 rotation 0 1 0 -1.5708 name "slot_3" lookupTable [ 0 0 0, 0.3 0.3 0 ] type "generic" }
+    Pose { translation 0.15 -0.13 0.452 children [ Shape { appearance PBRAppearance { baseColor 1 1 1 roughness 0.7 metalness 0 emissiveColor 0.3 0.3 0.3 } geometry Box { size 0.06 0.03 0.004 } } ] }
+    DEF SLOT_4 DistanceSensor { translation 0.15 0 0.451 rotation 0 1 0 -1.5708 name "slot_4" lookupTable [ 0 0 0, 0.3 0.3 0 ] type "generic" }
     DistanceSensor { translation 0.26 0 0.08 rotation 0 0 1 0 name "ds_front" lookupTable [ 0 0 0, 2 2 0 ] type "generic" }
     DistanceSensor { translation 0.26 0.08 0.08 rotation 0 0 1 0.26 name "ds_front_left" lookupTable [ 0 0 0, 2 2 0 ] type "generic" }
     DistanceSensor { translation 0.26 -0.08 0.08 rotation 0 0 1 -0.26 name "ds_front_right" lookupTable [ 0 0 0, 2 2 0 ] type "generic" }
@@ -701,11 +721,20 @@ DEF SUP_01 Robot {
   children [
     Pose { translation 0 0 0.08 children [ Shape { appearance PBRAppearance { baseColor 0.15 0.65 0.35 roughness 0.5 metalness 0 } geometry Box { size 0.5 0.36 0.14 } } ] }
     Pose { translation 0.245 0 0.11 children [ Shape { appearance PBRAppearance { baseColor 1 1 0.8 roughness 0.7 metalness 0 emissiveColor 0.9 0.9 0.6 } geometry Box { size 0.02 0.2 0.03 } } ] }
-    Pose { translation -0.2 0 0.33 children [ Shape { appearance PBRAppearance { baseColor 0.6 0.6 0.6 roughness 0.7 metalness 0.5 } geometry Box { size 0.03 0.34 0.36 } } ] }
+    Pose { translation -0.2 0 0.3 children [ Shape { appearance PBRAppearance { baseColor 0.6 0.6 0.6 roughness 0.7 metalness 0.5 } geometry Box { size 0.03 0.34 0.3 } } ] }
     Pose { translation 0 0 0.17 children [ Shape { appearance PBRAppearance { baseColor 0.3 0.3 0.3 roughness 0.7 metalness 0 } geometry Box { size 0.44 0.34 0.02 } } ] }
-    Pose { translation 0 0 0.29 children [ Shape { appearance PBRAppearance { baseColor 0.3 0.3 0.3 roughness 0.7 metalness 0 } geometry Box { size 0.44 0.34 0.02 } } ] }
-    Pose { translation 0 0 0.41 children [ Shape { appearance PBRAppearance { baseColor 0.3 0.3 0.3 roughness 0.7 metalness 0 } geometry Box { size 0.44 0.34 0.02 } } ] }
-    Pose { translation 0.02 0.03 0.23 children [ Shape { appearance PBRAppearance { baseColor 0.85 0.7 0.45 roughness 0.7 metalness 0 } geometry Box { size 0.2 0.15 0.1 } } ] }
+    Pose { translation 0 0 0.3 children [ Shape { appearance PBRAppearance { baseColor 0.3 0.3 0.3 roughness 0.7 metalness 0 } geometry Box { size 0.44 0.34 0.02 } } ] }
+    Pose { translation 0 0 0.445 children [ Shape { appearance PBRAppearance { baseColor 0.25 0.27 0.3 roughness 0.7 metalness 0 } geometry Box { size 0.42 0.32 0.01 } } ] }
+    Pose { translation -0.2 0 0.48 children [ Shape { appearance PBRAppearance { baseColor 0.15 0.65 0.35 roughness 0.7 metalness 0 } geometry Box { size 0.008 0.32 0.06 } } ] }
+    Pose { translation -0.0667 0 0.48 children [ Shape { appearance PBRAppearance { baseColor 0.15 0.65 0.35 roughness 0.7 metalness 0 } geometry Box { size 0.008 0.32 0.06 } } ] }
+    Pose { translation 0.0667 0 0.48 children [ Shape { appearance PBRAppearance { baseColor 0.15 0.65 0.35 roughness 0.7 metalness 0 } geometry Box { size 0.008 0.32 0.06 } } ] }
+    Pose { translation 0.2 0 0.48 children [ Shape { appearance PBRAppearance { baseColor 0.15 0.65 0.35 roughness 0.7 metalness 0 } geometry Box { size 0.008 0.32 0.06 } } ] }
+    Pose { translation -0.1333 -0.13 0.452 children [ Shape { appearance PBRAppearance { baseColor 1 1 1 roughness 0.7 metalness 0 emissiveColor 0.3 0.3 0.3 } geometry Box { size 0.08 0.03 0.004 } } ] }
+    DEF SLOT_1 DistanceSensor { translation -0.1333 0 0.451 rotation 0 1 0 -1.5708 name "slot_1" lookupTable [ 0 0 0, 0.3 0.3 0 ] type "generic" }
+    Pose { translation 0 -0.13 0.452 children [ Shape { appearance PBRAppearance { baseColor 1 1 1 roughness 0.7 metalness 0 emissiveColor 0.3 0.3 0.3 } geometry Box { size 0.08 0.03 0.004 } } ] }
+    DEF SLOT_2 DistanceSensor { translation 0 0 0.451 rotation 0 1 0 -1.5708 name "slot_2" lookupTable [ 0 0 0, 0.3 0.3 0 ] type "generic" }
+    Pose { translation 0.1333 -0.13 0.452 children [ Shape { appearance PBRAppearance { baseColor 1 1 1 roughness 0.7 metalness 0 emissiveColor 0.3 0.3 0.3 } geometry Box { size 0.08 0.03 0.004 } } ] }
+    DEF SLOT_3 DistanceSensor { translation 0.1333 0 0.451 rotation 0 1 0 -1.5708 name "slot_3" lookupTable [ 0 0 0, 0.3 0.3 0 ] type "generic" }
     DistanceSensor { translation 0.26 0 0.08 rotation 0 0 1 0 name "ds_front" lookupTable [ 0 0 0, 2 2 0 ] type "generic" }
     DistanceSensor { translation 0.26 0.08 0.08 rotation 0 0 1 0.26 name "ds_front_left" lookupTable [ 0 0 0, 2 2 0 ] type "generic" }
     DistanceSensor { translation 0.26 -0.08 0.08 rotation 0 0 1 -0.26 name "ds_front_right" lookupTable [ 0 0 0, 2 2 0 ] type "generic" }
@@ -919,4 +948,9 @@ DEF CLEAN_01 Robot {
   controllerArgs [ "--floor=F2" "--home=F2-CLEAN" "--speed=0.5" ]
   boundingObject Pose { translation 0 0 0.08 children [ Box { size 0.5 0.36 0.14 } ] }
   physics Physics { density -1 mass 15 centerOfMass [ 0 0 0.02 ] }
+}
+DEF NURSE Robot {
+  name "NURSE"
+  controller "rmms_nurse"
+  supervisor TRUE
 }
