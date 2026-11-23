@@ -1,0 +1,81 @@
+{
+  "name": "F2 giờ cao điểm: 7 việc, 3 robot",
+  "floor": "F2",
+  "note": "Thời gian tính bằng giây so với lúc chạy demo. speedFactor 0.72 và serviceSeconds 6 đo từ lần chạy Webots 21/11/2026.",
+  "config": {
+    "serviceSeconds": 6,
+    "speedFactor": 0.72
+  },
+  "tasks": [
+    {
+      "taskId": "NV-01",
+      "priority": "NORMAL",
+      "robotType": "SUPPLY_CART",
+      "pickup": "F2-STORE",
+      "dropoff": "F2-SURG",
+      "deadlineInSec": 297,
+      "item": "VT-GANG",
+      "qty": 5
+    },
+    {
+      "taskId": "NV-02",
+      "priority": "NORMAL",
+      "robotType": "SUPPLY_CART",
+      "pickup": "F2-STORE",
+      "dropoff": "F2-PEDS",
+      "deadlineInSec": 310,
+      "item": "VT-BONG",
+      "qty": 10
+    },
+    {
+      "taskId": "NV-03",
+      "priority": "NORMAL",
+      "robotType": "MED_CART",
+      "pickup": "F2-PHARM",
+      "dropoff": "F2-LAB",
+      "deadlineInSec": 277,
+      "item": "TH-NACL",
+      "qty": 15
+    },
+    {
+      "taskId": "NV-04",
+      "priority": "NORMAL",
+      "robotType": "MED_CART",
+      "pickup": "F2-PHARM",
+      "dropoff": "F2-RESP",
+      "deadlineInSec": 332,
+      "item": "TH-SIRO",
+      "qty": 20
+    },
+    {
+      "taskId": "NV-05",
+      "priority": "URGENT",
+      "robotType": "SUPPLY_CART",
+      "pickup": "F2-STORE",
+      "dropoff": "F2-WARD-B",
+      "deadlineInSec": 476,
+      "item": "VT-BONG",
+      "qty": 5
+    },
+    {
+      "taskId": "NV-06",
+      "priority": "URGENT",
+      "robotType": "SUPPLY_CART",
+      "pickup": "F2-STORE",
+      "dropoff": "F2-RESP",
+      "deadlineInSec": 325,
+      "item": "VT-KIMTIEM",
+      "qty": 10
+    },
+    {
+      "taskId": "NV-07",
+      "priority": "NORMAL",
+      "robotType": "MED_CART",
+      "pickup": "F2-PHARM",
+      "dropoff": "F2-LAB",
+      "deadlineInSec": 152,
+      "item": "TH-PARA",
+      "qty": 15
+    }
+  ]
+}
