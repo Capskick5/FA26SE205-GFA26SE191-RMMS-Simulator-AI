@@ -57,6 +57,8 @@ CLOSE_S = 1.5                         # cảm biến xác nhận xong → chờ 
 TIMEOUT_BY_ITEM = {"TH": 180, "VT": 300, "MAU": 120}   # hết giờ chờ (giây) theo loại hàng — Prototype v8.2
 GRACE_S = 120                         # hết giờ → báo Operator; im lặng thêm 2 phút thì robot tự đi tiếp
 BATTERY_PER_M = 0.15                  # % pin mỗi mét
+BATTERY_LOW, BATTERY_CRITICAL = 15, 10   # % — khớp cấu hình backend (Battery.WarningPercent / CriticalPercent)
+RESCUE_BATTERY = 60                   # người tới thay/sạc pin tại chỗ (lệnh RECOVER) → pin lên mức này
 CHARGE_PER_S = 1.0                    # % pin mỗi giây khi sạc
 SENSORS = ("ds_front", "ds_front_left", "ds_front_right", "ds_diag_left", "ds_diag_right", "ds_left", "ds_right")
 LED = {"IDLE": 1, "MOVING": 2, "AT_STOP": 2, "RETURNING": 2, "CHARGING": 3, "ERROR": 4}
@@ -133,16 +135,36 @@ class Radio:
         c.connect_async(MQTT_HOST, MQTT_PORT, keepalive=10)
         c.loop_start()
         self.client = c
+        self.dark_until = None             # giả lập MẤT KẾT NỐI: tới mốc giờ này mới nối lại
+
+    def go_dark(self, seconds, now):
+        """Giả lập mất mạng: ngừng vòng mạng → không gửi state, không ping broker.
+        Quá 15 s (1.5 × keepalive) broker tự phát last will OFFLINE — y như robot thật rớt Wi-Fi."""
+        if self.client is None:
+            return
+        self.dark_until = now + seconds
+        self.client.loop_stop()
+
+    def check_dark(self, now):
+        """Hết thời gian mất mạng → bật lại, paho tự nối lại và _on_connect báo ONLINE + nghe lệnh lại."""
+        if self.dark_until is not None and now >= self.dark_until:
+            self.dark_until = None
+            self.client.loop_start()
+            if not self.client.is_connected():
+                self.client.reconnect_delay_set(1, 5)
+            return True
+        return False
 
     def _on_connect(self, client, userdata, flags, rc, props=None):
         client.subscribe(f"rmms/v1/{self.rid}/order", qos=1)
+        client.subscribe(f"rmms/v1/{self.rid}/command", qos=1)   # STOP/RESUME khẩn của backend (Hải, 25/11)
         client.publish(f"rmms/v1/{self.rid}/connection",
                        json.dumps({"robotId": self.rid, "connection": "ONLINE", "ts": now_iso()}), qos=1, retain=True)
         print(f"[{self.rid}] MQTT đã kết nối {MQTT_HOST}:{MQTT_PORT}, đang nghe rmms/v1/{self.rid}/order", flush=True)
 
     @property
     def online(self):
-        return self.client is not None and self.client.is_connected()
+        return self.client is not None and self.dark_until is None and self.client.is_connected()
 
     def send_state(self, payload):
         if self.online:
@@ -278,6 +300,10 @@ class RmmsRobot:
         self.slot_votes = {i: 0 for i in self.slots}
         self.task_slot, self.task_item, self.stop_info = {}, {}, {}
         self.wait = None                   # đang chờ cảm biến ở điểm dừng (xem start_wait)
+        self.error = None                  # sự cố đang có, vd "BATTERY_CRITICAL" (status = ERROR)
+        self.before_error = None           # trạng thái trước sự cố, để RECOVER chạy tiếp
+        self.low_warned = False            # đã báo pin yếu chưa (báo 1 lần)
+        self.done_cmds = set()             # commandId đã làm (backend có thể gửi trùng)
 
     # ---- cảm biến ngăn hàng ------------------------------------------------
     def read_slots(self):
@@ -383,7 +409,26 @@ class RmmsRobot:
             print(f"[{self.rid}] Bỏ qua lệnh không phải JSON", flush=True)
             return
         cmd = str(o.get("command", "")).upper()
-        if cmd in ("CANCEL", "STOP"):
+        cid = o.get("commandId")
+        if cid:                                         # backend gửi "ít nhất 1 lần" → có thể trùng, bỏ lệnh đã làm
+            if cid in self.done_cmds:
+                return
+            self.done_cmds.add(cid)
+        if cmd == "STOP":                               # DỪNG KHẨN (nút đỏ của Operator): đứng yên, GIỮ lệnh đang dở
+            if self.error != "OPERATOR_STOP":
+                self.before_error = self.status if self.status != "ERROR" else self.before_error
+                self.status, self.error = "ERROR", "OPERATOR_STOP"
+                self.drive.stop()
+                print(f"[{self.rid}] DỪNG KHẨN theo lệnh Operator", flush=True)
+            self.radio.send_event({"type": "COMMAND_DONE", "command": "STOP", "commandId": cid})
+            return
+        if cmd == "RESUME":                             # bỏ dừng khẩn → chạy tiếp lệnh đang dở (không tự nhận lệnh mới)
+            if self.error == "OPERATOR_STOP":
+                self.status, self.error = self.before_error or "IDLE", None
+                print(f"[{self.rid}] Hết dừng khẩn → {self.status}", flush=True)
+            self.radio.send_event({"type": "COMMAND_DONE", "command": "RESUME", "commandId": cid})
+            return
+        if cmd == "CANCEL":
             self.path, self.i, self.order_id, self.wait = [], 0, None, None
             self.status = "IDLE"
             self.drive.stop()
@@ -392,6 +437,25 @@ class RmmsRobot:
         if cmd == "CONFIRM":                            # Operator bấm "Đã lấy hàng" / "Cho đi tiếp"
             if self.wait:
                 self.wait["confirmedBy"] = "OPERATOR"
+            return
+        if cmd == "FAULT":                              # GIẢ LẬP SỰ CỐ để thử WF-04 (chỉ dùng khi test/demo)
+            fault = str(o.get("fault", "")).upper()
+            if fault == "BATTERY":                      # pin tụt về mức X — chạy tiếp vài mét là chạm ngưỡng nguy hiểm
+                self.battery = float(o.get("value", BATTERY_CRITICAL + 2))
+                self.low_warned = self.battery <= BATTERY_LOW
+                print(f"[{self.rid}] GIẢ LẬP: pin tụt còn {self.battery:.0f}%", flush=True)
+            elif fault == "OFFLINE":                    # rớt mạng N giây, robot VẪN chạy tiếp lệnh đang có
+                sec = float(o.get("seconds", 20))
+                print(f"[{self.rid}] GIẢ LẬP: MẤT KẾT NỐI {sec:.0f} s — vẫn chạy lệnh đang có, không báo được về", flush=True)
+                self.radio.go_dark(sec, self.robot.getTime())
+            return
+        if cmd == "RECOVER":                            # người tới xử lý: thay/sạc pin tại chỗ rồi cho chạy tiếp
+            if self.error and self.error != "OPERATOR_STOP":   # dừng khẩn thì phải RESUME, không phải RECOVER
+                print(f"[{self.rid}] ĐÃ XỬ LÝ sự cố {self.error} → pin {max(self.battery, RESCUE_BATTERY):.0f}%, "
+                      f"chạy tiếp", flush=True)
+                self.radio.send_event({"type": "RECOVERED", "error": self.error})
+                self.battery = max(self.battery, RESCUE_BATTERY)
+                self.status, self.error, self.low_warned = self.before_error or "IDLE", None, False
             return
         if cmd == "EXTEND":                             # Operator bấm "Chờ thêm"
             if self.wait and self.wait["phase"] == "TIMEOUT":
@@ -432,6 +496,11 @@ class RmmsRobot:
             self.drive.stop()
             return
         self.battery = max(0.0, self.battery - BATTERY_PER_M * moved)
+        if self.status == "ERROR":                       # đang sự cố → đứng yên chờ người (lệnh RECOVER)
+            self.drive.stop()
+            return
+        if self.check_battery():
+            return
         if self.status == "AT_STOP":
             self.drive.stop()
             if self.wait:                                # chờ cảm biến ngăn hàng
@@ -461,6 +530,27 @@ class RmmsRobot:
             self.i += 1
             self._after_point()
 
+    def check_battery(self):
+        """Pin ≤ 15%: báo BATTERY_LOW một lần. Pin ≤ 10% khi đang làm việc: DỪNG TẠI CHỖ, báo BATTERY_CRITICAL
+        (hàng vẫn trong ngăn) → backend/Operator quyết: cứu tại chỗ (RECOVER) hay giao việc cho robot khác.
+        Trả True nếu vừa dừng vì pin."""
+        working = self.status in ("MOVING", "AT_STOP", "RETURNING")
+        if working and self.battery <= BATTERY_LOW and not self.low_warned:
+            self.low_warned = True
+            print(f"[{self.rid}] PIN YẾU {self.battery:.0f}% (≤ {BATTERY_LOW}%)", flush=True)
+            self.radio.send_event({"type": "BATTERY_LOW", "battery": int(self.battery), "orderId": self.order_id})
+        if working and self.battery <= BATTERY_CRITICAL:
+            self.before_error, self.status, self.error = self.status, "ERROR", "BATTERY_CRITICAL"
+            self.drive.stop()
+            cargo = [{"slot": i, "taskId": self._slot_task(i)} for i in sorted(self.slots) if self.slot_full[i]]
+            print(f"[{self.rid}] HẾT PIN GIỮA ĐƯỜNG {self.battery:.0f}% tại ({self.x:.1f}, {self.y:.1f}) → dừng, "
+                  f"chờ người. Hàng đang chở: {cargo or 'không'}", flush=True)
+            self.radio.send_event({"type": "BATTERY_CRITICAL", "battery": int(self.battery), "orderId": self.order_id,
+                                   "x": round(self.x, 2), "y": round(self.y, 2), "cargo": cargo})
+            self.send_state()
+            return True
+        return False
+
     def _after_point(self):
         if self.i < len(self.path):
             return
@@ -479,6 +569,7 @@ class RmmsRobot:
             "x": round(self.x, 2), "y": round(self.y, 2), "theta": round(self.th, 3),
             "battery": int(round(self.battery)), "speed": round(self.speed_now, 2),
             "status": self.status, "orderId": self.order_id, "nextNodeId": nxt, "atStopSeq": self.at_stop,
+            "error": self.error,                     # THÊM (24/11): mã sự cố khi status = ERROR, vd BATTERY_CRITICAL
             # THÊM (22/11): trạng thái từng ngăn theo cảm biến + đang chờ gì ở điểm dừng
             "compartments": [{"slot": i, "occupied": self.slot_full[i], "taskId": self._slot_task(i)}
                              for i in sorted(self.slots)],
@@ -498,6 +589,8 @@ class RmmsRobot:
             self.read_slots()
             while not self.radio.inbox.empty():
                 self.handle(self.radio.inbox.get())
+            if self.radio.check_dark(self.robot.getTime()):
+                print(f"[{self.rid}] CÓ MẠNG LẠI → nối lại broker, báo ONLINE", flush=True)
             self.update(moved)
             led = LED.get(self.status, 1)
             if self.wait:                                 # trắng = đang chờ hàng; đỏ = hết giờ chờ

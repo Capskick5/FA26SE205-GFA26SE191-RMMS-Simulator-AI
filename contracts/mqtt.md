@@ -1,4 +1,4 @@
-# Hợp đồng MQTT — Backend ↔ Robot (bản nháp v0.2, 22/11/2026)
+# Hợp đồng MQTT — Backend ↔ Robot (bản nháp v0.4, 25/11/2026)
 
 Robot (Webots hôm nay, robot thật sau này) và Backend chỉ nói chuyện qua Mosquitto bằng các topic dưới đây.
 Hai bên làm đúng file này thì không cần biết code của nhau. **Đổi gì ở đây phải báo cả hai bên.**
@@ -6,9 +6,18 @@ Hai bên làm đúng file này thì không cần biết code của nhau. **Đổ
 **v0.2 (22/11):** thêm cảm biến ngăn hàng — trường `compartments`, `wait` trong `state`; topic `event`;
 lệnh `CONFIRM`, `EXTEND`; `stops[].timeoutSec`, `graceSec`. Mọi trường v0.1 giữ nguyên tên và ý nghĩa.
 
+**v0.3 (24/11):** sự cố cho WF-04 — `state.error`; event `BATTERY_LOW`, `BATTERY_CRITICAL`, `RECOVERED`; lệnh `RECOVER`;
+lệnh giả lập `FAULT` (chỉ để test/demo). **Lưu ý backend (Hải, 23/11):** `RobotStateSubscriberWorker.Valid` đang từ chối
+`status = RETURNING` → robot đang về trạm bị coi là tin hỏng. Cần thêm `RETURNING` vào danh sách hợp lệ.
+
+**v0.4 (25/11):** khớp code Hải (commit a9ac67d) — topic `rmms/v1/{robotId}/command` cho `STOP`/`RESUME` khẩn
+(payload `{commandId, command, issuedAt}`). Robot trả event `COMMAND_DONE` có `commandId`; `commandId` trùng thì bỏ qua
+(outbox gửi "ít nhất 1 lần"). STOP → `status: ERROR`, `error: OPERATOR_STOP`, giữ lệnh đang dở; RESUME → chạy tiếp lệnh đó.
+
 | Topic | Chiều | Khi nào | QoS / retain |
 |---|---|---|---|
 | `rmms/v1/{robotId}/order` | Backend → Robot | khi giao chuyến, huỷ, xác nhận, chờ thêm | 1 / không |
+| `rmms/v1/{robotId}/command` | Backend → Robot | Operator bấm dừng khẩn / cho chạy lại (`STOP`, `RESUME`) | 1 / không |
 | `rmms/v1/{robotId}/state` | Robot → Backend | mỗi 1 giây | 0 / không |
 | `rmms/v1/{robotId}/event` | Robot → Backend | khi có chuyện xảy ra một lần (cảm biến ngăn đổi, hết giờ chờ...) | 1 / không |
 | `rmms/v1/{robotId}/connection` | Robot → Backend | khi kết nối; mất điện thì Mosquitto tự gửi (last will) | 1 / **có** |
@@ -53,6 +62,20 @@ Toạ độ: mét, `x` hướng đông, `y` hướng bắc, gốc theo bản đ�
 | `{ "command": "CANCEL", "robotId": "MED-01" }` | Huỷ chuyến | dừng tại chỗ, về `IDLE` |
 | `{ "command": "CONFIRM", "robotId": "MED-01" }` | "Đã lấy hàng" / "Cho đi tiếp" | thôi chờ cảm biến, đi tiếp (`STOP_DONE` với `by: OPERATOR`) |
 | `{ "command": "EXTEND", "robotId": "MED-01", "seconds": 120 }` | "Chờ thêm" (sau khi hết giờ) | chờ cảm biến thêm `seconds` giây |
+| `{ "command": "RECOVER", "robotId": "MED-01" }` | "Đã xử lý sự cố" (người tới thay/sạc pin tại chỗ) | hết `ERROR`, pin ≥ 60%, chạy tiếp lệnh đang dở |
+| `{ "command": "FAULT", "fault": "BATTERY", "value": 12 }` | **chỉ để test/demo** | pin tụt còn `value`% |
+| `{ "command": "FAULT", "fault": "OFFLINE", "seconds": 25 }` | **chỉ để test/demo** | rớt mạng `seconds` giây, robot vẫn chạy lệnh đang có |
+
+## 1c. Sự cố (WF-04)
+
+| Sự cố | Robot làm gì | Backend thấy gì |
+|---|---|---|
+| **Pin ≤ 15%** khi đang làm việc | chạy tiếp | event `BATTERY_LOW` (1 lần) |
+| **Pin ≤ 10%** khi đang làm việc (hết pin giữa đường) | **dừng tại chỗ**, giữ hàng trong ngăn, chờ người | `status: ERROR`, `error: BATTERY_CRITICAL`; event `BATTERY_CRITICAL` có `x, y, cargo[{slot, taskId}]` |
+| **Mất mạng** | vẫn chạy lệnh đang có (robot tự hành), không báo về được | hết `state` → >5 s coi mất kết nối; ~15 s sau Mosquitto gửi `connection: OFFLINE`; có mạng lại → `ONLINE` + `state` như bình thường |
+
+Gợi ý backend: `BATTERY_CRITICAL` → tạo sự cố, Operator chọn **cứu tại chỗ** (gửi `RECOVER`) hoặc **chuyển việc cho robot khác**
+(huỷ chuyến này, tạo chuyến mới từ vị trí `x, y` của robot hỏng — hàng trong `cargo`).
 
 ## 1b. Robot chờ ở điểm dừng — CẢM BIẾN NGĂN HÀNG
 
@@ -89,6 +112,7 @@ Khi đang chờ ở điểm dừng: `"wait": { "stopSeq": 1, "expect": "LOAD", "
 |---|---|
 | `status` | `IDLE` rảnh · `MOVING` đang đi · `AT_STOP` đang ở điểm dừng · `RETURNING` đang về trạm · `CHARGING` đang sạc · `ERROR` lỗi |
 | `atStopSeq` | đang đứng ở điểm dừng số mấy (khi `AT_STOP`), còn lại `null` |
+| `error` | mã sự cố khi `status = ERROR` (vd `BATTERY_CRITICAL`), còn lại `null` |
 | `theta` | hướng mặt robot (radian): 0 = đông, π/2 = bắc |
 | `battery` | % pin (số nguyên) |
 
@@ -107,6 +131,10 @@ Gợi ý phía backend: lưu `x, y, battery, speed` vào `TelemetrySnapshot`, c�
 | `STOP_DONE` | `stopSeq, by (SENSOR/OPERATOR), action, taskIds` | xong điểm dừng, robot sắp đi |
 | `PICKUP_SHORT` / `NOT_RECEIVED` | `stopSeq, taskIds` | hết giờ chờ → hiện cảnh báo cho Operator |
 | `PICKUP_FAILED` / `DELIVERY_FAILED` | `stopSeq, taskIds` | Operator không xử lý → robot tự đi tiếp |
+| `BATTERY_LOW` | `battery, orderId` | pin ≤ 15% khi đang làm việc |
+| `BATTERY_CRITICAL` | `battery, orderId, x, y, cargo[{slot, taskId}]` | pin ≤ 10% → robot dừng tại chỗ chờ người |
+| `RECOVERED` | `error` | người đã xử lý (lệnh `RECOVER`), robot chạy tiếp |
+| `COMMAND_DONE` | `command, commandId` | robot đã làm lệnh `STOP`/`RESUME` (backend đánh dấu outbox đã giao) |
 
 ## 3. `connection`
 

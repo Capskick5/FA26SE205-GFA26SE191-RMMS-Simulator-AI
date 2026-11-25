@@ -6,6 +6,11 @@
     python tools/send_order.py MED-01 cancel                          # huỷ lệnh, robot đứng yên
     python tools/send_order.py MED-01 confirm                         # Operator bấm "Đã lấy hàng / cho đi tiếp"
     python tools/send_order.py MED-01 extend 120                      # Operator bấm "Chờ thêm 120 s"
+    python tools/send_order.py MED-01 fault battery 12                # SỰ CỐ: pin tụt còn 12% → chạy thêm ~13 m là hết pin, dừng
+    python tools/send_order.py MED-01 fault offline 20                # SỰ CỐ: rớt mạng 20 s (robot vẫn chạy, không báo về)
+    python tools/send_order.py MED-01 recover                         # người tới xử lý: thay pin tại chỗ, chạy tiếp
+    python tools/send_order.py MED-01 stop                            # DỪNG KHẨN (giống nút của Hải, topic /command)
+    python tools/send_order.py MED-01 resume                          # bỏ dừng khẩn, chạy tiếp
     python tools/send_order.py nurse absent NV-TEST                   # y tá giả bỏ qua việc NV-TEST (thử hết giờ)
     python tools/send_order.py nurse normal                           # y tá giả làm bình thường lại
 
@@ -110,8 +115,20 @@ def send(robot_id, stops, with_path):
         c.publish("rmms/sim/nurse", json.dumps(payload), qos=1).wait_for_publish(5)
         print(f"Đã gửi rmms/sim/nurse: {payload}")
         return
-    if stops == ["cancel"]:
+    topic = f"rmms/v1/{robot_id}/order"
+    if stops[0] in ("stop", "resume"):                         # đúng định dạng backend của Hải (25/11)
+        import uuid
+        topic = f"rmms/v1/{robot_id}/command"
+        payload = {"commandId": str(uuid.uuid4()), "command": stops[0].upper(), "issuedAt": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())}
+    elif stops == ["cancel"]:
         payload = {"command": "CANCEL", "robotId": robot_id}
+    elif stops[0] == "fault":                                  # giả lập sự cố: fault battery 12 | fault offline 20
+        kind = stops[1].upper() if len(stops) > 1 else "BATTERY"
+        payload = {"command": "FAULT", "robotId": robot_id, "fault": kind}
+        if len(stops) > 2:
+            payload["value" if kind == "BATTERY" else "seconds"] = float(stops[2])
+    elif stops[0] == "recover":                                # người tới xử lý sự cố, cho robot chạy tiếp
+        payload = {"command": "RECOVER", "robotId": robot_id}
     elif stops[0] in ("confirm", "extend"):                    # Operator bấm "Đã lấy hàng" / "Chờ thêm"
         payload = {"command": stops[0].upper(), "robotId": robot_id}
         if stops[0] == "extend":
@@ -131,7 +148,6 @@ def send(robot_id, stops, with_path):
         }
         if with_path:
             payload["path"] = plan_path(floor, robot_id, stops)
-    topic = f"rmms/v1/{robot_id}/order"
     c.publish(topic, json.dumps(payload), qos=1).wait_for_publish(5)
     print(f"Đã gửi {topic}:\n{json.dumps(payload, ensure_ascii=False, indent=1)}")
     c.loop_stop()
