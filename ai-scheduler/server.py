@@ -60,6 +60,8 @@ class Handler(BaseHTTPRequestHandler):
             out = plan(req)
         except KeyError as e:
             return self._send(400, {"error": f"thiếu trường {e}"})
+        except (ValueError, TypeError, AttributeError) as e:   # dữ liệu sai định dạng là lỗi bên gọi → 400, không phải 500
+            return self._send(400, {"error": f"dữ liệu không hợp lệ: {e}"})
         except Exception as e:  # lỗi bất ngờ: báo 500, backend sẽ chuyển sang luật dự phòng
             traceback.print_exc()
             return self._send(500, {"error": str(e)})

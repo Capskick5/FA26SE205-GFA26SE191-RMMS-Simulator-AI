@@ -16,6 +16,7 @@ Chỉ dùng thư viện chuẩn của Python — không mạng, không API ngoà
 """
 from __future__ import annotations
 
+import heapq
 import math
 import time
 from dataclasses import dataclass, field
@@ -33,8 +34,10 @@ DEFAULTS = {
     "serviceSeconds": 30.0,                             # đứng ở mỗi điểm dừng bao lâu (Webots: 5)
     "speedFactor": 1.0,                                 # tốc độ thực tế / tốc độ ghi trên giấy (đo được: Webots ≈ 0.72
                                                         #   vì robot phải tăng tốc, quay đầu, né nhau)
-    "defaultDeadlineMin": {"URGENT": 15.0, "NORMAL": 60.0},  # việc không ghi hạn thì lấy hạn này tính từ lúc tạo
+    "defaultDeadlineMin": {"URGENT": 15.0, "HIGH": 30.0, "NORMAL": 60.0},  # việc không ghi hạn thì lấy hạn này tính từ lúc tạo
     "timeLimitSeconds": 1.0,                            # bước 3 chạy tối đa bao lâu
+    "pickupOneAtATime": True,                           # điểm lấy hàng (quầy thuốc, kho) phục vụ 1 robot một lúc:
+                                                        #   robot tới sau phải xếp hàng chờ robot trước lấy xong
 }
 EPS = 1e-9
 
@@ -79,6 +82,7 @@ class RouteEval:
     meters: float
     finish_s: float
     deliver_s: dict[str, float]
+    wait_s: float = 0.0        # thời gian xếp hàng chờ ở điểm lấy hàng (robot khác đang lấy)
 
 
 class Planner:
@@ -86,10 +90,19 @@ class Planner:
         self.cfg = {**DEFAULTS, **(req.get("config") or {})}
         self.dist = req.get("distances") or {}
         now = _parse_time(req.get("now")) or datetime.now(timezone.utc)
-        self.tasks = {t["taskId"]: self._task(t, now) for t in req.get("tasks", [])}
-        self.bots = {r["robotId"]: self._bot(r) for r in req.get("robots", [])}
+        tasks, robots = req.get("tasks", []), req.get("robots", [])
+        for name, rows, key in (("taskId", tasks, "taskId"), ("robotId", robots, "robotId")):
+            ids = [r[key] for r in rows]
+            if len(ids) != len(set(ids)):           # trùng mã → việc bị gộp mất âm thầm (tester bắt được) → từ chối luôn
+                raise ValueError(f"{name} bị trùng: {sorted({i for i in ids if ids.count(i) > 1})}")
+        self.tasks = {t["taskId"]: self._task(t, now) for t in tasks}
+        self.bots = {r["robotId"]: self._bot(r) for r in robots}
+        if self.cfg["speedFactor"] <= 0 or any(b.speed <= 0 for b in self.bots.values()):
+            raise ValueError("speed và speedFactor phải > 0")
         self.skipped_bots: dict[str, str] = {}
         self._eval_cache: dict[tuple, RouteEval | None] = {}
+        self._plan_cache: dict[tuple, tuple[float, dict]] = {}
+        self.docks = {t.pickup for t in self.tasks.values()}   # các điểm lấy hàng → phục vụ từng robot một
         self.trace: list[dict] = []        # nhật ký "AI nghĩ gì" từng bước — chỉ để xem, không ảnh hưởng kết quả
         self.tries = 0                     # đã thử bao nhiêu phương án
 
@@ -139,6 +152,7 @@ class Planner:
         deliver: dict[str, float] = {}
         result: RouteEval | None = None
         one_pickup, first_pickup, delivered_any = cfg["onePickupPerTrip"], None, False
+        started = False                    # robot đứng sẵn ở quầy vẫn phải mất thời gian lấy hàng (tester bắt được)
         for task_id, kind in events:
             task = self.tasks[task_id]
             node = task.pickup if kind == "P" else task.dropoff
@@ -150,8 +164,9 @@ class Planner:
             step = self.d(here, node)
             if math.isinf(step):
                 break
-            if node != here:               # cùng một chỗ thì không tốn thêm thời gian đứng
+            if node != here or not started:   # cùng chỗ với điểm trước thì không tốn thêm thời gian đứng
                 t += step / (bot.speed * cfg["speedFactor"]) + cfg["serviceSeconds"]
+            started = True
             meters += step
             here = node
             load += task.slots if kind == "P" else -task.slots
@@ -174,7 +189,73 @@ class Planner:
         return math.inf if e is None else e.cost
 
     def total_cost(self, plan: Plan) -> float:
-        return sum(self.route_cost(r, ev) for r, ev in plan.routes.items())
+        return self.plan_evals(plan)[0]
+
+    def plan_evals(self, plan: Plan) -> tuple[float, dict[str, RouteEval]]:
+        """Chấm CẢ KẾ HOẠCH: chạy mô phỏng mọi robot cùng lúc theo thời gian.
+        Hai robot tới cùng một điểm lấy hàng → robot tới sau xếp hàng chờ (pickupOneAtATime).
+        Trả (tổng điểm phạt, {robot: kết quả chuyến}). Có chuyến không làm được → tổng = vô cực."""
+        key = tuple(sorted((b, tuple(ev)) for b, ev in plan.routes.items() if ev))
+        if key in self._plan_cache:
+            return self._plan_cache[key]
+        cfg, evals = self.cfg, {}
+        for b, ev in key:
+            e = self.evaluate(b, list(ev))
+            if e is None:
+                self._plan_cache[key] = (math.inf, {})
+                return self._plan_cache[key]
+            evals[b] = e
+        if not cfg["pickupOneAtATime"] or len(evals) < 2:
+            result = (sum(e.cost for e in evals.values()), evals)
+            self._plan_cache[key] = result
+            return result
+
+        # gom dãy sự kiện thành các "lần ghé" (mỗi lần tới một điểm mới)
+        visits: dict[str, list[dict]] = {}
+        for b, ev in key:
+            bot, here, vs = self.bots[b], self.bots[b].node, []
+            for task_id, kind in ev:
+                task = self.tasks[task_id]
+                node = task.pickup if kind == "P" else task.dropoff
+                if node != here or not vs:
+                    travel = self.d(here, node) / (bot.speed * cfg["speedFactor"])
+                    vs.append({"node": node, "travel": travel, "service": True, "pickup": False, "drops": []})
+                    here = node
+                if kind == "P":
+                    vs[-1]["pickup"] = True
+                else:
+                    vs[-1]["drops"].append(task_id)
+            visits[b] = vs
+
+        # mô phỏng theo thời gian: lần ghé nào tới trước thì xử lý trước (công bằng: ai tới trước lấy trước)
+        free_at: dict[str, float] = {}
+        state = {b: {"deliver": {}, "wait": 0.0, "finish": 0.0} for b in visits}
+        heap = [(visits[b][0]["travel"], b, 0) for b in visits]
+        heapq.heapify(heap)
+        while heap:
+            arrive, b, i = heapq.heappop(heap)
+            v, st = visits[b][i], state[b]
+            start = arrive
+            if v["pickup"] and v["service"] and v["node"] in self.docks:
+                start = max(arrive, free_at.get(v["node"], 0.0))
+                free_at[v["node"]] = start + cfg["serviceSeconds"]
+                st["wait"] += start - arrive
+            done = start + (cfg["serviceSeconds"] if v["service"] else 0.0)
+            for task_id in v["drops"]:
+                st["deliver"][task_id] = done
+            st["finish"] = done
+            if i + 1 < len(visits[b]):
+                heapq.heappush(heap, (done + visits[b][i + 1]["travel"], b, i + 1))
+
+        total, out = 0.0, {}
+        for b, e in evals.items():
+            st = state[b]
+            late = sum(max(0.0, t - self.tasks[k].deadline_s) / 60.0 * self.tasks[k].weight for k, t in st["deliver"].items())
+            cost = late + e.meters / cfg["metersPerPoint"]
+            out[b] = RouteEval(cost, e.meters, st["finish"], st["deliver"], st["wait"])
+            total += cost
+        self._plan_cache[key] = (total, out)
+        return total, out
 
     # ---------- tìm chỗ nhét tốt nhất cho một việc
     def best_insertion(self, plan: Plan, task_id: str, only: str | None = None):
@@ -187,12 +268,16 @@ class Planner:
             if self.bots[bot_id].type != task.robot_type:
                 continue
             ev = plan.routes[bot_id]
-            base = self.route_cost(bot_id, ev)
+            base = self.total_cost(plan)              # chấm cả kế hoạch: tính cả robot khác phải xếp hàng chờ
+            trial = Plan(dict(plan.routes))
             for i in range(len(ev) + 1):
                 for j in range(i, len(ev) + 1):
                     cand = ev[:i] + [(task_id, "P")] + ev[i:j] + [(task_id, "D")] + ev[j:]
                     self.tries += 1
-                    delta = self.route_cost(bot_id, cand) - base
+                    if self.evaluate(bot_id, cand) is None:     # quá ngăn / hết pin / không có đường
+                        continue
+                    trial.routes[bot_id] = cand
+                    delta = self.total_cost(trial) - base
                     if delta < best[0] - EPS:
                         best = (delta, bot_id, cand)
         return best
@@ -254,12 +339,15 @@ class Planner:
                     improved = True
             # (b) CHUYỂN: nhấc 1 việc ra, nhét vào chỗ tốt nhất (robot khác hoặc vị trí khác)
             for task_id in self._assigned(plan):
+                if time.perf_counter() > stop_at:          # hết giờ giữa vòng → dừng ngay (tester bắt được: 1 vòng có thể > 4 s)
+                    stats["timeUp"] = True
+                    break
                 owner = self._owner(plan, task_id)
                 old = plan.routes[owner]
                 without = [e for e in old if e[0] != task_id]
-                saved = self.route_cost(owner, old) - self.route_cost(owner, without)
                 trial = plan.copy()
                 trial.routes[owner] = without
+                saved = self.total_cost(plan) - self.total_cost(trial)
                 delta, bot_id, cand = self.best_insertion(trial, task_id)
                 if bot_id is not None and delta < saved - EPS:
                     trial.routes[bot_id] = cand
@@ -274,11 +362,14 @@ class Planner:
             # (c) ĐỔI CHÉO: việc x của robot A ↔ việc y của robot B
             assigned = self._assigned(plan)
             for a_idx, x in enumerate(assigned):
+                if time.perf_counter() > stop_at:
+                    stats["timeUp"] = True
+                    break
                 for y in assigned[a_idx + 1:]:
                     ra, rb = self._owner(plan, x), self._owner(plan, y)
                     if ra == rb or self.tasks[x].robot_type != self.tasks[y].robot_type:
                         continue
-                    before = self.route_cost(ra, plan.routes[ra]) + self.route_cost(rb, plan.routes[rb])
+                    before = self.total_cost(plan)
                     trial = plan.copy()
                     trial.routes[ra] = [e for e in trial.routes[ra] if e[0] != x]
                     trial.routes[rb] = [e for e in trial.routes[rb] if e[0] != y]
@@ -290,7 +381,7 @@ class Planner:
                     if b2 is None:
                         continue
                     trial.routes[ra] = c2
-                    after = self.route_cost(ra, trial.routes[ra]) + self.route_cost(rb, trial.routes[rb])
+                    after = self.total_cost(trial)
                     if after < before - EPS:
                         self._log("3-SỬA", f"ĐỔI CHÉO {x} ({ra}) ↔ {y} ({rb}). Tổng điểm phạt "
                                            f"{self.total_cost(plan):.3f} → {self.total_cost(trial):.3f} (giảm → GIỮ)")
@@ -320,17 +411,19 @@ class Planner:
     # ---------- bước 4: đóng gói kết quả
     def _output(self, draft, draft_cost, plan, cost, stats, elapsed, improved) -> dict:
         plans, explain = [], []
+        _, evals = self.plan_evals(plan)
         for bot_id in sorted(plan.routes):
             ev = plan.routes[bot_id]
             if not ev:
                 continue
-            e = self.evaluate(bot_id, ev)
+            e = evals[bot_id]
             plans.append({
                 "robotId": bot_id,
                 "stops": self._stops(ev),
                 "taskIds": sorted({x[0] for x in ev}),
                 "distanceM": round(e.meters, 1),
                 "finishInSec": round(e.finish_s),
+                "queueWaitSec": round(e.wait_s),          # chờ ở điểm lấy hàng vì robot khác đang lấy
                 "cost": round(e.cost, 3),
             })
             for task_id in sorted(e.deliver_s, key=e.deliver_s.get):
@@ -340,8 +433,9 @@ class Planner:
                 explain.append({
                     "taskId": task_id, "robotId": bot_id, "priority": task.priority,
                     "etaSec": round(eta), "deadlineInSec": round(task.deadline_s), "lateSec": round(late),
-                    "text": (f"{task_id} ({'GẤP' if task.priority == 'URGENT' else 'thường'}) → {bot_id}"
+                    "text": (f"{task_id} ({ {'URGENT': 'GẤP', 'HIGH': 'cao'}.get(task.priority, 'thường')}) → {bot_id}"
                              + (f", gom chung với {', '.join(mates)}" if mates else "")
+                             + (f", xếp hàng chờ lấy hàng ~{e.wait_s:.0f}s" if e.wait_s >= 1 else "")
                              + f"; giao sau ~{eta / 60:.1f} phút, hạn còn {task.deadline_s / 60:.1f} phút"
                              + (f" → TRỄ {late / 60:.1f} phút" if late > 0 else " → kịp")),
                 })
@@ -368,17 +462,14 @@ class Planner:
 
     def _totals(self, plan: Plan, prefix: str) -> dict:
         """Tổng mét chạy và thời điểm robot cuối cùng xong việc — backend lưu để so AI với luật."""
-        evals = [self.evaluate(b, ev) for b, ev in plan.routes.items() if ev]
+        evals = list(self.plan_evals(plan)[1].values())
         return {f"{prefix}DistanceM": round(sum(e.meters for e in evals), 1),
-                f"{prefix}FinishSec": round(max((e.finish_s for e in evals), default=0))}
+                f"{prefix}FinishSec": round(max((e.finish_s for e in evals), default=0)),
+                f"{prefix}QueueWaitSec": round(sum(e.wait_s for e in evals))}
 
     def _late_count(self, plan: Plan) -> int:
-        n = 0
-        for bot_id, ev in plan.routes.items():
-            if ev:
-                e = self.evaluate(bot_id, ev)
-                n += sum(1 for k, t in e.deliver_s.items() if t > self.tasks[k].deadline_s)
-        return n
+        return sum(1 for e in self.plan_evals(plan)[1].values()
+                   for k, t in e.deliver_s.items() if t > self.tasks[k].deadline_s)
 
     def _stops(self, events: list[tuple[str, str]]) -> list[dict]:
         """Dãy sự kiện → điểm dừng. Hai sự kiện liền nhau cùng điểm, cùng hành động thì gộp làm một."""

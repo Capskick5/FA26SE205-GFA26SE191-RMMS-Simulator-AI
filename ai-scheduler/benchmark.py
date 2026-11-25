@@ -60,12 +60,10 @@ def bm04(p: Planner) -> Plan:
 
 
 def measure(p: Planner, plan: Plan) -> dict:
-    late, late_min, eta, meters = 0, 0.0, [], 0.0
-    for b, ev in plan.routes.items():
-        if not ev:
-            continue
-        e = p.evaluate(b, ev)
+    late, late_min, eta, meters, wait = 0, 0.0, [], 0.0, 0.0
+    for b, e in p.plan_evals(plan)[1].items():      # tính cả xếp hàng ở điểm lấy hàng
         meters += e.meters
+        wait += e.wait_s
         for tid, t in e.deliver_s.items():
             eta.append(t / 60)
             over = t - p.tasks[tid].deadline_s
@@ -73,7 +71,7 @@ def measure(p: Planner, plan: Plan) -> dict:
                 late += 1
                 late_min += over / 60
     return {"late": late, "lateMin": late_min, "avgEta": statistics.mean(eta) if eta else 0, "meters": meters,
-            "cost": p.total_cost(plan), "missed": len(p.tasks) - len(eta)}
+            "cost": p.total_cost(plan), "queueSec": wait, "missed": len(p.tasks) - len(eta)}
 
 
 def main():
@@ -96,7 +94,7 @@ def main():
     print(f"\n{n} kịch bản ngẫu nhiên tầng F2 · 3 robot · 6–12 việc mỗi kịch bản (seed 0..{n - 1})\n")
     print(f"{'':28}{'BM04 (1 việc/chuyến)':>22}{'LUẬT (chia nháp)':>18}{'AI (sửa dần)':>15}")
     for key, label, fmt in (("late", "Việc trễ / kịch bản", "{:.2f}"), ("lateMin", "Tổng phút trễ / kịch bản", "{:.1f}"),
-                            ("avgEta", "Thời gian giao TB (phút)", "{:.2f}"), ("meters", "Tổng mét chạy", "{:.0f}"),
+                            ("avgEta", "Thời gian giao TB (phút)", "{:.2f}"), ("meters", "Tổng mét chạy", "{:.0f}"), ("queueSec", "Giây xếp hàng ở quầy", "{:.0f}"),
                             ("cost", "Điểm phạt", "{:.2f}")):
         print(f"{label:28}" + "".join(f"{fmt.format(avg(f'{m}_{key}')):>{w}}" for m, w in (("BM04", 22), ("LUAT", 18), ("AI", 15))))
     better = sum(r["AI_cost"] < r["LUAT_cost"] - 1e-9 for r in rows)

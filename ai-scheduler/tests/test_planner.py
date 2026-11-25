@@ -81,6 +81,34 @@ class Rules(unittest.TestCase):
         self.assertLessEqual(eta["GAP"], eta["THUONG"])
 
 
+class Queue(unittest.TestCase):
+    """Điểm lấy hàng phục vụ 1 robot một lúc: robot tới sau phải xếp hàng."""
+
+    def _two_robots_one_each(self, one_at_a_time):
+        sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+        from planner import Plan, Planner
+        req = {"now": NOW, "robots": [bot("R1"), bot("R2")], "distances": DIST,
+               "tasks": [task("T1", "B", "C", 600), task("T2", "B", "D", 600)],
+               "config": {"serviceSeconds": 30, "pickupOneAtATime": one_at_a_time}}
+        p = Planner(req)
+        plan = Plan({"R1": [("T1", "P"), ("T1", "D")], "R2": [("T2", "P"), ("T2", "D")]})
+        return p.plan_evals(plan)[1]
+
+    def test_robot_toi_sau_phai_cho(self):
+        ev = self._two_robots_one_each(True)
+        self.assertEqual(sorted(round(e.wait_s) for e in ev.values()), [0, 30])   # 1 robot chờ đúng 30 s lấy hàng
+
+    def test_tat_luat_thi_khong_cho(self):
+        ev = self._two_robots_one_each(False)
+        self.assertEqual([e.wait_s for e in ev.values()], [0.0, 0.0])
+
+    def test_ai_biet_tranh_xep_hang(self):
+        # quầy lấy hàng chậm (120 s): 2 việc cùng quầy, giao 2 phòng cạnh nhau → AI để 1 robot gom cả 2 thay vì 2 robot chen nhau
+        out = run([bot("R1"), bot("R2")], [task("T1", "A", "C", 900), task("T2", "A", "D", 900)], serviceSeconds=120)
+        self.assertEqual(len(out["plans"]), 1)
+        self.assertEqual(out["score"]["finalQueueWaitSec"], 0)
+
+
 class Improvement(unittest.TestCase):
     def test_ai_khong_bao_gio_te_hon_ban_nhap(self):
         rng = random.Random(7)
